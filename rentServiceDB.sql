@@ -1,12 +1,24 @@
-CREATE TYPE "room_type" (
-  'regular',
-  'improved',
-  'eu-renovatiion'
+CREATE TYPE "room_type" AS ENUM (
+  'REGULAR',
+  'IMPROVED',
+  'EU-RENOVATED'
 );
 
-CREATE TYPE "payment_frequency" (
-  'monthly',
-  'quarterly'
+CREATE TYPE "payment_frequency" AS ENUM (
+  'MONTHLY',
+  'QUARTERLY'
+);
+
+CREATE TYPE "role" AS ENUM (
+  'INDIVIDUAL',
+  'ENTITY',
+  'MODERATOR',
+  'ADMIN'
+);
+
+CREATE TYPE "gender" AS ENUM (
+  'MALE',
+  'FEMALE'
 );
 
 CREATE TABLE "users" (
@@ -44,19 +56,19 @@ CREATE TABLE "agreements" (
   "lasts_to" TIMESTAMP WITHOUT TIME ZONE
 );
 
-CREATE TABLE "agreement_room" (
-  "agreement_id" BIGINT,
-  "rented_room_id" BIGINT
-);
-
 CREATE TABLE "rooms" (
   "id" BIGSERIAL PRIMARY KEY,
+  "building_id" BIGINT,
   "telephone" boolean, 
-  "area" double,
+  "area" decimal,
+  "number" integer,
+  "floor" integer,
   "type" room_type
 );
 
-CREATE TABLE "rented_rooms" (
+CREATE TABLE "agreement_room" (
+  "id" BIGSERIAL PRIMARY KEY,
+  "agreement_id" BIGINT,
   "room_id" BIGINT,
   "purpose_of_rent" varchar(100),
   "start_of_rent" TIMESTAMP WITHOUT TIME ZONE,
@@ -72,21 +84,15 @@ CREATE TABLE "buildings" (
   "telephone" varchar(30)
 );
 
-CREATE TABLE "building_rooms" (
-  "building_id" BIGINT,
-  "room_id" BIGINT,
-  "number" integer,
-  "floor" integer
-);
-
 CREATE TABLE "passports" (
   "id" BIGSERIAL PRIMARY KEY,
+  "user_id" BIGINT, 
   "fullname" varchar(60),
   "date_of_birth" TIMESTAMP WITHOUT TIME ZONE,
   "date_of_issue" TIMESTAMP WITHOUT TIME ZONE,
   "issued_by" varchar(100),
-  "number" varchar(6),
-  "series" varchar(9),
+  "number" integer,
+  "series" integer,
   "gender" gender,
   "place_of_birth" varchar(100)
 );
@@ -126,12 +132,10 @@ ALTER TABLE "entity_user" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "agreements" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
-ALTER TABLE "building_rooms" ADD FOREIGN KEY ("building_id") REFERENCES "buildings" ("id");
-
-ALTER TABLE "building_rooms" ADD FOREIGN KEY ("room_id") REFERENCES "rooms" ("id");
+ALTER TABLE "rooms" ADD FOREIGN KEY ("building_id") REFERENCES "buildings" ("id");
 
 ALTER TABLE "agreement_room" ADD FOREIGN KEY ("agreement_id") REFERENCES "agreements" ("id");
 
-ALTER TABLE "agreement_room" ADD FOREIGN KEY ("rented_room_id") REFERENCES "rented_rooms" ("id");
+ALTER TABLE "agreement_room" ADD FOREIGN KEY ("room_id") REFERENCES "rooms" ("id");
 
-ALTER TABLE "rented_rooms" ADD FOREIGN KEY ("room_id") REFERENCES "rooms" ("id");
+ALTER TABLE "passports" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
