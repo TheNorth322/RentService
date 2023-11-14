@@ -29,7 +29,7 @@ public class PassportDto {
                 .fullname(entity.getFullname())
                 .dateOfBirth(entity.getDateOfBirth())
                 .dateOfIssue(entity.getDateOfIssue())
-                .issuedBy(entity.getIssuedBy())
+                .issuedBy(entity.getMigrationService().getName())
                 .number(entity.getNumber())
                 .series(entity.getSeries())
                 .gender(entity.getGender())

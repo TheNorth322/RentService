@@ -3,6 +3,7 @@ package com.example.rentservice.service;
 import com.example.rentservice.dto.agreement.CreateAgreementRequest;
 import com.example.rentservice.entity.agreement.AgreementEntity;
 import com.example.rentservice.entity.agreement.AgreementRoomEntity;
+import com.example.rentservice.entity.room.RoomEntity;
 import com.example.rentservice.entity.user.UserEntity;
 import com.example.rentservice.exception.auth.UserNotFoundException;
 import com.example.rentservice.exception.room.RoomNotFoundException;
@@ -36,14 +37,14 @@ public class AgreementService {
                 .stream()
                 .map((room) -> {
                     try {
+                        RoomEntity roomEntity = roomRepository.findById(room.getRoomId()).orElseThrow(() -> new RoomNotFoundException("Room not found"))
                         return AgreementRoomEntity
                                 .builder()
-                                .room(roomRepository.findById(room.getRoomId()).orElseThrow(() -> new RoomNotFoundException("Room not found")))
+                                .room(roomEntity)
                                 .startOfRent(room.getStartOfRent())
                                 .endOfRent(room.getEndOfRent())
                                 .purposeOfRent(room.getPurposeOfRent())
-                                .rentAmount(//TODO)
-
+                                .rentAmount()
                                 .build();
                     } catch (RoomNotFoundException e) {
                         throw new RuntimeException(e);
@@ -57,10 +58,10 @@ public class AgreementService {
                 .additionalConditions(request.getAdditionalConditions())
                 .paymentFrequency(request.getPaymentFrequency())
                 .fine(request.getFine())
+                .rents(rooms)
                 .startsFrom(request.getStartsFrom())
                 .lastsTo(request.getLastsTo())
                 .build();
-
 
         userRepository.save(user.addAgreement(agreement));
 

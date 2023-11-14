@@ -21,7 +21,14 @@ public class PassportEntity {
     @GeneratedValue
     private Long id;
 
-    private String fullname;
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
+    @Column(name = "surname")
+    private String surname;
 
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
@@ -36,9 +43,9 @@ public class PassportEntity {
     @Column(name = "place_of_birth")
     private String placeOfBirth;
 
-    private Integer number;
+    private String number;
 
-    private Integer series;
+    private String series;
 
     @Enumerated(EnumType.STRING)
     private Gender gender;

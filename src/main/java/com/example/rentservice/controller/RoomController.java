@@ -1,6 +1,8 @@
 package com.example.rentservice.controller;
 
+import com.example.rentservice.dto.room.AddRoomTypesToRoomRequest;
 import com.example.rentservice.dto.room.CreateRoomRequest;
+import com.example.rentservice.dto.room.CreateRoomTypeRequest;
 import com.example.rentservice.service.RoomService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +29,38 @@ public class RoomController {
     }
 
     @GetMapping("/{id}")
-    private ResponseEntity getRoomById(@RequestPart Long id) {
+    public ResponseEntity getRoomById(@RequestPart Long id) {
         try {
             return ResponseEntity.ok(roomService.getRoomById(id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/type/create")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity createRoomType(@RequestBody CreateRoomTypeRequest request) {
+        try {
+            return ResponseEntity.ok(roomService.createRoomType(request));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/type/add")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity addRoomTypes(@RequestBody AddRoomTypesToRoomRequest request) {
+        try {
+            return ResponseEntity.ok(roomService.addRoomTypesToRoom(request));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/types")
+    public ResponseEntity getAllTypes() {
+        try {
+            return ResponseEntity.ok(roomService.getAllTypes());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

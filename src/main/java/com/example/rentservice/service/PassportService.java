@@ -5,6 +5,8 @@ import com.example.rentservice.dto.passport.PassportDto;
 import com.example.rentservice.entity.user.IndividualUserEntity;
 import com.example.rentservice.entity.user.MigrationServiceEntity;
 import com.example.rentservice.entity.user.PassportEntity;
+import com.example.rentservice.entity.user.UserEntity;
+import com.example.rentservice.exception.MigrationServiceNotFoundException;
 import com.example.rentservice.exception.auth.IndividualUserNotFoundException;
 import com.example.rentservice.exception.passport.PassportNotFoundException;
 import com.example.rentservice.exception.auth.UserNotFoundException;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PassportService {
@@ -56,19 +59,21 @@ public class PassportService {
         return user;
     }
 
-    public IndividualUserEntity addPassport(AddPassportRequest request) throws UserNotFoundException {
+    public IndividualUserEntity addPassport(AddPassportRequest request) throws UserNotFoundException, MigrationServiceNotFoundException {
         validateRequest(request);
         IndividualUserEntity user = individualUserRepository.findByUser_Username(request.getUsername()).orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        Optional<MigrationServiceEntity> migrationServiceOptional = migrationServiceRepository.findByName(request.getMigrationServiceName());
-        MigrationServiceEntity migrationService = migrationServiceOptional.orElseGet(() -> MigrationServiceEntity.builder().name(request.getMigrationServiceName()).build());;
+        MigrationServiceEntity migrationService = migrationServiceRepository.findById(request.getMigrationServiceId())
+                .orElseThrow(() -> new MigrationServiceNotFoundException("Migration service not found"));
 
         PassportEntity passport = PassportEntity
                 .builder()
                 .user(user)
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .surname(request.getSurname())
                 .dateOfBirth(request.getDateOfBirth())
                 .dateOfIssue(request.getDateOfIssue())
-                .fullname(request.getFullname())
                 .gender(request.getGender())
                 .number(request.getNumber())
                 .series(request.getSeries())
@@ -79,6 +84,15 @@ public class PassportService {
         migrationServiceRepository.save(migrationService.addPassport(passport));
 
         return individualUserRepository.save(user.addPassport(passport));
+    }
+
+    public List<PassportDto> getUserPassports(String username) throws UserNotFoundException {
+        UserEntity user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
+        return passportRepository
+                .findAllByUser(user)
+                .stream()
+                .map(PassportDto::toDto)
+                .toList();
     }
 
     private void validateRequest(AddPassportRequest request) {

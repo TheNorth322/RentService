@@ -1,5 +1,6 @@
 package com.example.rentservice.entity.user;
 
+import com.example.rentservice.entity.BankEntity;
 import com.example.rentservice.entity.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -20,13 +21,20 @@ public class EntityUserEntity {
 
     private String name;
 
-    @Column(name = "supervisor_full_name")
-    private String supervisorFullName;
+    @Column(name = "supervisor_first_name")
+    private String supervisorFirstName;
+
+    @Column(name = "supervisor_last_name")
+    private String supervisorLastName;
+
+    @Column(name = "supervisor_surname")
+    private String supervisorSurname;
 
     private String address;
 
-    @Column(name = "bank_name")
-    private String bankName;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "bank_id", referencedColumnName = "id")
+    private BankEntity bank;
 
     @Column(name = "checking_account")
     private String checkingAccount;

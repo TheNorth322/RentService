@@ -1,8 +1,6 @@
 package com.example.rentservice.controller;
 
-import com.example.rentservice.dto.auth.AuthenticationRequest;
-import com.example.rentservice.dto.auth.AuthenticationResponse;
-import com.example.rentservice.dto.auth.RegisterRequest;
+import com.example.rentservice.dto.auth.*;
 import com.example.rentservice.entity.auth.RefreshToken;
 import com.example.rentservice.exception.auth.RefreshTokenNotFoundException;
 import com.example.rentservice.service.AuthenticationService;
@@ -10,6 +8,7 @@ import com.example.rentservice.service.JwtService;
 import com.example.rentservice.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,10 +19,28 @@ public class AuthenticationController {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
 
-    @PostMapping("/register")
-    public ResponseEntity register(@RequestBody RegisterRequest request) {
+    @PostMapping("/register/user")
+    public ResponseEntity registerUser(@RequestBody RegisterRequest request) {
         try {
-            return ResponseEntity.ok(authService.register(request));
+            return ResponseEntity.ok(authService.registerUser(request));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/register/entity")
+    public ResponseEntity registerEntity(@RequestBody RegisterEntityRequest request) {
+        try {
+            return ResponseEntity.ok(authService.registerEntity(request));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/register/individual")
+    public ResponseEntity registerIndividual(@RequestBody RegisterIndividualRequest request) {
+        try {
+            return ResponseEntity.ok(authService.registerIndividual(request));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

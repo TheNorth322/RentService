@@ -14,12 +14,14 @@ import java.util.Date;
 @NoArgsConstructor
 public class AddPassportRequest {
     private String username;
-    private String fullname;
+    private String firstName;
+    private String lastName;
+    private String surname;
     private Date dateOfBirth;
     private Date dateOfIssue;
-    private String migrationServiceName;
-    private Integer number;
-    private Integer series;
+    private Long migrationServiceId;
+    private String number;
+    private String series;
     private Gender gender;
     private String placeOfBirth;
 }

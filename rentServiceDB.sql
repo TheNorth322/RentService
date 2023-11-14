@@ -6,7 +6,6 @@ CREATE TYPE "payment_frequency" AS ENUM (
 CREATE TYPE "role" AS ENUM (
   'INDIVIDUAL',
   'ENTITY',
-  'MODERATOR',
   'ADMIN'
 );
 
@@ -17,12 +16,12 @@ CREATE TYPE "gender" AS ENUM (
 
 CREATE TABLE "users" (
   "id" BIGSERIAL PRIMARY KEY,
-  "username" varchar(20) UNIQUE,
-  "email" varchar(100),
+  "username" varchar(20) UNIQUE NOT NULL,
+  "email" varchar(100) NOT NULL,
   "email_verified" boolean,
-  "password" varchar(100),
-  "phone_number" varchar(30),
-  "role" role
+  "password" varchar(100) NOT NULL,
+  "phone_number" varchar(30) NOT NULL,
+  "role" role NOT NULL
 );
 
 CREATE TABLE "individual_user" (
@@ -33,9 +32,11 @@ CREATE TABLE "individual_user" (
 CREATE TABLE "entity_user" (
   "user_id" BIGINT,
   "name" varchar(100),
-  "supervisor_full_name" varchar(100),
+  "supervisor_first_name" varchar(20),
+  "supervisor_last_name" varchar(20),
+  "supervisor_surname" varchar(20),
   "address" varchar(100),
-  "bank_name" varchar(30),
+  "bank_id" BIGINT,
   "checking_account" varchar(40),
   "itn_number" varchar(30)
 );
@@ -66,7 +67,7 @@ CREATE TABLE "user_rooms" (
   "room_id" BIGINT
 );
 
-CREATE TABLE "room_image" (
+CREATE TABLE "room_images" (
   "id" BIGSERIAL PRIMARY KEY,
   "room_id" BIGINT,
   "url" varchar(60)
@@ -114,13 +115,15 @@ CREATE TABLE "migration_services" (
 
 CREATE TABLE "passports" (
   "id" BIGSERIAL PRIMARY KEY,
-  "user_id" BIGINT, 
-  "fullname" varchar(60),
+  "user_id" BIGINT,
+  "first_name" varchar,
+  "last_name" varchar,
+  "surname" varchar,
   "date_of_birth" TIMESTAMP WITHOUT TIME ZONE,
   "date_of_issue" TIMESTAMP WITHOUT TIME ZONE,
-  "migration_service_id" BIGINT, 
-  "number" integer,
-  "series" integer,
+  "migration_service_id" BIGINT,
+  "number" varchar,
+  "series" varchar, 
   "gender" gender,
   "place_of_birth" varchar(100)
 );
@@ -146,7 +149,10 @@ CREATE TABLE "refresh_tokens" (
   "expiry_date" TIMESTAMP WITHOUT TIME ZONE
 );
 
-ALTER TABLE "refresh_tokens" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+CREATE TABLE "banks" (
+  "id" BIGSERIAL PRIMARY KEY,
+  "name" varchar
+);
 
 ALTER TABLE "email_verif_tokens" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
@@ -181,3 +187,5 @@ ALTER TABLE "passports" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 ALTER TABLE "room_types" ADD FOREIGN KEY ("room_id") REFERENCES "rooms" ("id");
 
 ALTER TABLE "room_types" ADD FOREIGN KEY ("type_id") REFERENCES "types" ("id");
+
+ALTER TABLE "entity_user" ADD FOREIGN KEY ("bank_id") REFERENCES "banks" ("id");

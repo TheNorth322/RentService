@@ -1,17 +1,17 @@
 package com.example.rentservice.service;
 
-import com.example.rentservice.dto.auth.AuthenticationRequest;
-import com.example.rentservice.dto.auth.AuthenticationResponse;
-import com.example.rentservice.dto.auth.RegisterRequest;
+import com.example.rentservice.dto.auth.*;
 import com.example.rentservice.dto.email.EmailDetails;
 import com.example.rentservice.entity.auth.EmailVerificationTokenEntity;
 import com.example.rentservice.entity.auth.PasswordResetTokenEntity;
 import com.example.rentservice.entity.auth.RefreshToken;
+import com.example.rentservice.entity.user.EntityUserEntity;
+import com.example.rentservice.entity.user.IndividualUserEntity;
 import com.example.rentservice.entity.user.UserEntity;
+import com.example.rentservice.exception.BankNotFoundException;
+import com.example.rentservice.exception.MigrationServiceNotFoundException;
 import com.example.rentservice.exception.auth.*;
-import com.example.rentservice.repository.EmailVerificationTokenRepository;
-import com.example.rentservice.repository.PasswordResetTokenRepository;
-import com.example.rentservice.repository.UserRepository;
+import com.example.rentservice.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,7 +34,13 @@ public class AuthenticationService {
     private UserRepository userRepository;
 
     @Autowired
+    private BankRepository bankRepository;
+
+    @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private PassportService passportService;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -51,7 +57,13 @@ public class AuthenticationService {
     @Autowired
     private EmailService emailService;
 
-    public AuthenticationResponse register(RegisterRequest request) throws UserNotFoundException, EmailIsOccupiedException, UsernameIsOccupiedException {
+    @Autowired
+    private EntityUserRepository entityUserRepository;
+
+    @Autowired
+    private IndividualUserRepository individualUserRepository;
+
+    public AuthenticationResponse registerUser(RegisterRequest request) throws UserNotFoundException, EmailIsOccupiedException, UsernameIsOccupiedException {
         validateReqisterRequest(request);
 
         UserEntity user = UserEntity
@@ -73,6 +85,41 @@ public class AuthenticationService {
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken.getToken())
                 .build();
+    }
+
+    public AuthenticationResponse registerEntity(RegisterEntityRequest request) throws UserNotFoundException, EmailIsOccupiedException, UsernameIsOccupiedException, BankNotFoundException {
+        AuthenticationResponse response = this.registerUser(request.getRegisterRequest());
+        UserEntity user = userRepository.findByUsername(request.getRegisterRequest().getUsername()).orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        EntityUserEntity entity = EntityUserEntity
+                .builder()
+                .bank(bankRepository.findById(request.getBankId()).orElseThrow(() -> new BankNotFoundException("Bank not found")))
+                .name(request.getName())
+                .supervisorFirstName(request.getSupervisorFirstName())
+                .supervisorLastName(request.getSupervisorLastName())
+                .supervisorSurname(request.getSupervisorSurname())
+                .checkingAccount(request.getCheckingAccount())
+                .itnNumber(request.getItnNumber())
+                .user(user)
+                .build();
+
+        user.setEntityUser(entity);
+        userRepository.save(user);
+
+        return response;
+    }
+
+    public AuthenticationResponse registerIndividual(RegisterIndividualRequest request) throws UserNotFoundException, EmailIsOccupiedException, UsernameIsOccupiedException, MigrationServiceNotFoundException {
+        AuthenticationResponse response = this.registerUser(request.getRegisterRequest());
+        UserEntity user = userRepository.findByUsername(request.getRegisterRequest().getUsername()).orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        individualUserRepository.save(IndividualUserEntity
+                .builder()
+                .user(user)
+                .build());
+        passportService.addPassport(request.getAddPassportRequest());
+
+        return response;
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) throws UserNotFoundException {

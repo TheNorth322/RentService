@@ -35,6 +35,23 @@ public class UserController {
         }
     }
 
+    @PostMapping("/{username}/passports")
+    public ResponseEntity getUserPassports(@PathVariable String username) {
+        try {
+            return ResponseEntity.ok(passportService.getUserPassports(username));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/set/passport")
+    public ResponseEntity setActivePassport(@RequestParam(name = "passport_id") Long passportId) {
+        try {
+            return ResponseEntity.ok(passportService.setActivePassport(passportId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
     @GetMapping("/{username}/agreements")
     public ResponseEntity getUserAgreements(@PathVariable String username) {
         try {

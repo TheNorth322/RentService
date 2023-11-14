@@ -1,8 +1,9 @@
 package com.example.rentservice.service;
 
-import com.example.rentservice.dto.room.CreateRoomRequest;
-import com.example.rentservice.dto.room.RoomDto;
+import com.example.rentservice.dto.room.*;
 import com.example.rentservice.entity.room.RoomEntity;
+import com.example.rentservice.entity.room.TypeEntity;
+import com.example.rentservice.exception.TypeExistsException;
 import com.example.rentservice.exception.building.BuildingNotFoundException;
 import com.example.rentservice.exception.TypeNotFoundException;
 import com.example.rentservice.exception.room.RoomNotFoundException;
@@ -11,6 +12,9 @@ import com.example.rentservice.repository.RoomRepository;
 import com.example.rentservice.repository.TypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RoomService {
@@ -49,5 +53,33 @@ public class RoomService {
 
     public RoomDto getRoomById(Long id) throws RoomNotFoundException {
         return RoomDto.toDto(roomRepository.findById(id).orElseThrow(() -> new RoomNotFoundException("Room not found")));
+    }
+
+    public TypeDto createRoomType(CreateRoomTypeRequest request) throws TypeExistsException {
+        Optional<TypeEntity> typeOptional = typeRepository.findByText(request.getText());
+        if (typeOptional.isPresent())
+            throw new TypeExistsException("Type already exists");
+
+        return TypeDto.toDto(typeRepository.save(TypeEntity
+                .builder()
+                .text(request.getText())
+                .build()
+        ));
+    }
+
+    public String addRoomTypesToRoom(AddRoomTypesToRoomRequest request) throws RoomNotFoundException, TypeNotFoundException {
+        RoomEntity room = roomRepository.findById(request.getRoomId()).orElseThrow(() -> new RoomNotFoundException("Room not found"));
+
+        for (Long typeId: request.getTypesIds()) {
+            TypeEntity type = typeRepository.findById(typeId).orElseThrow(() -> new TypeNotFoundException("Type not found"));
+            room.addType(type);
+        }
+
+        roomRepository.save(room);
+        return "Types were successfully added";
+    }
+
+    public List<TypeDto> getAllTypes() {
+        return typeRepository.findAll().stream().map(TypeDto::toDto).toList();
     }
 }
