@@ -1,5 +1,6 @@
 package com.example.rentservice.service;
 
+import com.example.rentservice.dto.IndividualUserDto;
 import com.example.rentservice.dto.passport.AddPassportRequest;
 import com.example.rentservice.dto.passport.PassportDto;
 import com.example.rentservice.entity.user.IndividualUserEntity;
@@ -14,6 +15,8 @@ import com.example.rentservice.repository.IndividualUserRepository;
 import com.example.rentservice.repository.MigrationServiceRepository;
 import com.example.rentservice.repository.PassportRepository;
 import com.example.rentservice.repository.UserRepository;
+import lombok.SneakyThrows;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -87,15 +90,6 @@ public class PassportService {
         return individualUserRepository.save(user.addPassport(passport));
     }
 
-    public List<PassportDto> getUserPassports(String username) throws UserNotFoundException {
-        UserEntity user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
-        return passportRepository
-                .findAllByUser(user)
-                .stream()
-                .map(PassportDto::toDto)
-                .toList();
-    }
-
     private void validateRequest(AddPassportRequest request) {
         //TODO
     }
@@ -110,5 +104,16 @@ public class PassportService {
         individualUserRepository.save(individualUser);
 
         return "Passport was changed successfully";
+    }
+
+    public IndividualUserDto getUserIndividualInfo(String username) throws UserNotFoundException, IndividualUserNotFoundException {
+        IndividualUserEntity user = individualUserRepository.findByUser_Username(username).orElseThrow(() -> new IndividualUserNotFoundException("Individual user not found"));
+        List<PassportDto> passports = getUserPassport(username);
+
+        return IndividualUserDto
+                .builder()
+                .passports(passports)
+                .activePassport(PassportDto.toDto(user.getActivePassport()))
+                .build();
     }
 }

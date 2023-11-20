@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Data
@@ -32,11 +33,11 @@ public class AgreementRoomEntity {
     private String purposeOfRent;
 
     @Column(name = "start_of_rent")
-    private LocalDateTime startOfRent;
+    private Date startOfRent;
 
     @Column(name = "end_of_rent")
-    private LocalDateTime endOfRent;
+    private Date endOfRent;
 
     @Column(name = "rent_amount")
-    private Double rentAmount;
+    private Integer rentAmount;
 }

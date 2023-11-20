@@ -25,20 +25,19 @@ public class UserController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
-    @PostMapping("/{username}/passport")
-    public ResponseEntity getUserPassport(@PathVariable String username) {
+    @GetMapping("/{username}/individual")
+    public ResponseEntity getUserIndividualInfo(@PathVariable String username) {
         try {
-            return ResponseEntity.ok(passportService.getUserPassport(username));
+            return ResponseEntity.ok(passportService.getUserIndividualInfo(username));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-    }
 
-    @PostMapping("/{username}/passports")
-    public ResponseEntity getUserPassports(@PathVariable String username) {
+    }
+    @GetMapping("/{username}/entity")
+    public ResponseEntity getUserEntityInfo(@PathVariable String username) {
         try {
-            return ResponseEntity.ok(passportService.getUserPassports(username));
+            return ResponseEntity.ok(userService.getUserEntityInfo(username));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

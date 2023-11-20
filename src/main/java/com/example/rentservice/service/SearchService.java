@@ -29,9 +29,6 @@ public class SearchService {
     private BuildingService buildingService;
 
     @Autowired
-    private DistrictService districtService;
-
-    @Autowired
     private MigrationService migrationService;
 
     @Autowired

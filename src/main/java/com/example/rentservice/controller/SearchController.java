@@ -32,14 +32,6 @@ public class SearchController {
         }
     }
 
-    @GetMapping("/districts")
-    public ResponseEntity searchDistrictsByName(@RequestParam String name) {
-        try {
-            return ResponseEntity.ok(searchService.searchDistrictsByName(name));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
     @GetMapping("/rooms")
     public ResponseEntity searchRoomsByType(@RequestParam Long typeId) {
         try {

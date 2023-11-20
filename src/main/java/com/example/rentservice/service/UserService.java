@@ -1,9 +1,11 @@
 package com.example.rentservice.service;
 
+import com.example.rentservice.dto.EntityUserDto;
 import com.example.rentservice.dto.agreement.AgreementDto;
 import com.example.rentservice.dto.user.UserDto;
 import com.example.rentservice.entity.room.RoomEntity;
 import com.example.rentservice.entity.user.UserEntity;
+import com.example.rentservice.exception.UserIsNotEntityException;
 import com.example.rentservice.exception.auth.UserNotFoundException;
 import com.example.rentservice.exception.room.RoomNotFoundException;
 import com.example.rentservice.repository.RoomRepository;
@@ -22,6 +24,9 @@ public class UserService {
     @Autowired
     private RoomRepository roomRepository;
 
+    @Autowired
+    private JwtService jwtService;
+
     public UserDto getUserByUsername(String username) throws UserNotFoundException {
         return UserDto.toDto(userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found")));
     }
@@ -32,5 +37,14 @@ public class UserService {
                 .stream()
                 .map(AgreementDto::toDto)
                 .toList();
+    }
+
+    public EntityUserDto getUserEntityInfo(String username) throws UserNotFoundException, UserIsNotEntityException {
+        UserEntity user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (user.getEntityUser() == null)
+            throw new UserIsNotEntityException("User is not entity");
+
+        return EntityUserDto.toDto(user.getEntityUser());
     }
 }

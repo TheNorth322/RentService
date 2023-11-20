@@ -1,5 +1,6 @@
 package com.example.rentservice.dto.passport;
 
+import com.example.rentservice.dto.MigrationServiceDto;
 import com.example.rentservice.entity.user.PassportEntity;
 import com.example.rentservice.enums.Gender;
 import lombok.AllArgsConstructor;
@@ -14,22 +15,26 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PassportDto {
-    private String fullname;
+    private String firstName;
+    private String lastName;
+    private String surname;
     private Date dateOfBirth;
     private Date dateOfIssue;
-    private String issuedBy;
-    private Integer number;
-    private Integer series;
+    private MigrationServiceDto issuedBy;
+    private String number;
+    private String series;
     private Gender gender;
     private String placeOfBirth;
 
     public static PassportDto toDto(PassportEntity entity) {
         return PassportDto
                 .builder()
-                .fullname(entity.getFullname())
+                .firstName(entity.getFirstName())
+                .lastName(entity.getLastName())
+                .surname(entity.getSurname())
                 .dateOfBirth(entity.getDateOfBirth())
                 .dateOfIssue(entity.getDateOfIssue())
-                .issuedBy(entity.getMigrationService().getName())
+                .issuedBy(MigrationServiceDto.toDto(entity.getMigrationService()))
                 .number(entity.getNumber())
                 .series(entity.getSeries())
                 .gender(entity.getGender())
