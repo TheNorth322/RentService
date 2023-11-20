@@ -8,8 +8,8 @@ import com.example.rentservice.entity.user.PassportEntity;
 import com.example.rentservice.entity.user.UserEntity;
 import com.example.rentservice.exception.MigrationServiceNotFoundException;
 import com.example.rentservice.exception.auth.IndividualUserNotFoundException;
-import com.example.rentservice.exception.passport.PassportNotFoundException;
 import com.example.rentservice.exception.auth.UserNotFoundException;
+import com.example.rentservice.exception.passport.PassportNotFoundException;
 import com.example.rentservice.repository.IndividualUserRepository;
 import com.example.rentservice.repository.MigrationServiceRepository;
 import com.example.rentservice.repository.PassportRepository;
@@ -18,11 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class PassportService {
+    @Autowired
+    private JwtService jwtService;
+
     @Autowired
     private IndividualUserRepository individualUserRepository;
 
@@ -97,5 +98,17 @@ public class PassportService {
 
     private void validateRequest(AddPassportRequest request) {
         //TODO
+    }
+
+    public String setActivePassport(String token, Long passportId) throws IndividualUserNotFoundException, PassportNotFoundException {
+        String username = jwtService.extractUsername(token);
+        IndividualUserEntity individualUser = individualUserRepository.findByUser_Username(username).orElseThrow(() -> new IndividualUserNotFoundException("Individual user not found"));
+        PassportEntity passport = passportRepository.findById(passportId).orElseThrow(() -> new PassportNotFoundException("Passport not found"));
+
+        individualUser.setActivePassport(passport);
+
+        individualUserRepository.save(individualUser);
+
+        return "Passport was changed successfully";
     }
 }

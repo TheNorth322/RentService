@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.engine.internal.Cascade;
 
 import java.util.Set;
 
@@ -26,6 +27,9 @@ public class IndividualUserEntity {
     @OneToMany(mappedBy = "user")
     private Set<PassportEntity> passports;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "active_passport_id", referencedColumnName = "id")
+    private PassportEntity activePassport;
     public IndividualUserEntity addPassport(PassportEntity passport) {
         passports.add(passport);
         passport.setUser(this);

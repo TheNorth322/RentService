@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateBuildingRequest {
-    private String district;
     private String address;
+    private String fiasId;
     private Integer floorCount;
     private String telephone;
 }

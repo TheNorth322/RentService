@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="room_image")
+@Table(name="room_images")
 public class RoomImageEntity {
     @Id
     @GeneratedValue

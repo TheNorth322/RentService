@@ -1,13 +1,11 @@
 package com.example.rentservice.controller;
 
+import com.example.rentservice.dto.SearchAddressesRequest;
 import com.example.rentservice.service.SearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -46,6 +44,15 @@ public class SearchController {
     public ResponseEntity searchRoomsByType(@RequestParam Long typeId) {
         try {
             return ResponseEntity.ok(searchService.searchRoomsByType(typeId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/addresses")
+    public ResponseEntity searchAdresses(@RequestBody SearchAddressesRequest request) {
+        try {
+            return ResponseEntity.ok(searchService.searchAddresses(request));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

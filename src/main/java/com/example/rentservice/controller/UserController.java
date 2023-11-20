@@ -45,9 +45,9 @@ public class UserController {
     }
 
     @PostMapping("/set/passport")
-    public ResponseEntity setActivePassport(@RequestParam(name = "passport_id") Long passportId) {
+    public ResponseEntity setActivePassport(@RequestParam String token, @RequestParam(name = "passport_id") Long passportId) {
         try {
-            return ResponseEntity.ok(passportService.setActivePassport(passportId));
+            return ResponseEntity.ok(passportService.setActivePassport(token, passportId));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

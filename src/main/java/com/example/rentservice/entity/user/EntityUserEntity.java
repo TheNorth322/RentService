@@ -1,5 +1,6 @@
 package com.example.rentservice.entity.user;
 
+import com.example.rentservice.entity.AddressEntity;
 import com.example.rentservice.entity.BankEntity;
 import com.example.rentservice.entity.user.UserEntity;
 import jakarta.persistence.*;
@@ -30,7 +31,9 @@ public class EntityUserEntity {
     @Column(name = "supervisor_surname")
     private String supervisorSurname;
 
-    private String address;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id", referencedColumnName = "id")
+    private AddressEntity address;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "bank_id", referencedColumnName = "id")

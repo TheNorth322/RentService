@@ -1,7 +1,13 @@
 package com.example.rentservice.service;
 
+import com.example.rentservice.dto.AddressDto;
+import com.example.rentservice.dto.CreateAddressRequest;
+import com.example.rentservice.dto.CreateMigrationServiceRequest;
 import com.example.rentservice.dto.MigrationServiceDto;
+import com.example.rentservice.entity.AddressEntity;
 import com.example.rentservice.entity.user.MigrationServiceEntity;
+import com.example.rentservice.exception.AddressAlreadyExistsException;
+import com.example.rentservice.exception.AddressNotFoundException;
 import com.example.rentservice.exception.MigrationServiceExistsException;
 import com.example.rentservice.exception.NoMigrationServicesFoundException;
 import com.example.rentservice.repository.MigrationServiceRepository;
@@ -14,6 +20,9 @@ import java.util.List;
 public class MigrationService {
     @Autowired
     private MigrationServiceRepository migrationServiceRepository;
+
+    @Autowired
+    private AddressService addressService;
 
     public List<MigrationServiceDto> getMigrationServices() {
         return migrationServiceRepository.findAll().stream().map(MigrationServiceDto::toDto).toList();
@@ -30,16 +39,29 @@ public class MigrationService {
                 .map(MigrationServiceDto::toDto)
                 .toList();
     }
-    public MigrationServiceDto createMigrationService(String name) throws MigrationServiceExistsException {
-        if (migrationServiceRepository.findByName(name).isPresent()) {
+    public MigrationServiceDto createMigrationService(CreateMigrationServiceRequest request) throws MigrationServiceExistsException, AddressNotFoundException {
+
+        if (migrationServiceRepository.findByName(request.getName()).isPresent()) {
             throw new MigrationServiceExistsException("Migration service already exists");
         }
-
-        return MigrationServiceDto.toDto(migrationServiceRepository.save(
-                MigrationServiceEntity
-                        .builder()
-                        .name(name)
-                        .build()
-        ));
+        try {
+            AddressEntity address = addressService.createAddress(CreateAddressRequest.builder().name(request.getName()).fiasId(request.getFiasId()).build());
+            return MigrationServiceDto.toDto(migrationServiceRepository.save(
+                    MigrationServiceEntity
+                            .builder()
+                            .name(request.getName())
+                            .address(address)
+                            .build()
+           ));
+        } catch (AddressAlreadyExistsException e) {
+            AddressEntity address = addressService.findByFiasId(request.getFiasId());
+            return MigrationServiceDto.toDto(migrationServiceRepository.save(
+                    MigrationServiceEntity
+                            .builder()
+                            .name(request.getName())
+                            .address(address)
+                            .build()
+            ));
+        }
     }
 }

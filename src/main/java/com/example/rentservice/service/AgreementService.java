@@ -37,7 +37,7 @@ public class AgreementService {
                 .stream()
                 .map((room) -> {
                     try {
-                        RoomEntity roomEntity = roomRepository.findById(room.getRoomId()).orElseThrow(() -> new RoomNotFoundException("Room not found"))
+                        RoomEntity roomEntity = roomRepository.findById(room.getRoomId()).orElseThrow(() -> new RoomNotFoundException("Room not found"));
                         return AgreementRoomEntity
                                 .builder()
                                 .room(roomEntity)

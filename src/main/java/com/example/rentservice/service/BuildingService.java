@@ -3,7 +3,10 @@ package com.example.rentservice.service;
 import com.example.rentservice.dto.building.BuildingDto;
 import com.example.rentservice.dto.building.CreateBuildingRequest;
 import com.example.rentservice.dto.room.RoomDto;
+import com.example.rentservice.entity.AddressEntity;
 import com.example.rentservice.entity.building.BuildingEntity;
+import com.example.rentservice.exception.AddressNotFoundException;
+import com.example.rentservice.exception.BuildingAlreadyExistsException;
 import com.example.rentservice.exception.building.BuildingNotFoundException;
 import com.example.rentservice.exception.building.NoBuildingsFoundException;
 import com.example.rentservice.repository.BuildingRepository;
@@ -17,11 +20,18 @@ public class BuildingService {
     @Autowired
     private BuildingRepository buildingRepository;
 
-    public BuildingDto createBuilding(CreateBuildingRequest request) {
+    @Autowired
+    private AddressService addressService;
+
+    public BuildingDto createBuilding(CreateBuildingRequest request) throws AddressNotFoundException, BuildingAlreadyExistsException {
+        AddressEntity address = addressService.findByFiasId(request.getFiasId());
+
+        if (buildingRepository.findByAddress(address).isPresent())
+            throw new BuildingAlreadyExistsException("Building already exists");
+
         BuildingEntity building = BuildingEntity
                 .builder()
-                .address(request.getAddress())
-                .district(request.getDistrict())
+                .address(address)
                 .floorCount(request.getFloorCount())
                 .telephone(request.getTelephone())
                 .build();

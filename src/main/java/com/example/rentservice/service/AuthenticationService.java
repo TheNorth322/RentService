@@ -84,6 +84,8 @@ public class AuthenticationService {
                 .builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken.getToken())
+                .username(user.getUsername())
+                .role(user.getRole())
                 .build();
     }
 
@@ -138,6 +140,8 @@ public class AuthenticationService {
                 .builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken.getToken())
+                .username(user.getUsername())
+                .role(user.getRole())
                 .build();
     }
 

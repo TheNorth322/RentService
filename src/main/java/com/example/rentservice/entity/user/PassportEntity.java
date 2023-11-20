@@ -53,4 +53,7 @@ public class PassportEntity {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private IndividualUserEntity user;
+
+    @OneToOne(mappedBy = "activePassport")
+    private IndividualUserEntity individualUser;
 }

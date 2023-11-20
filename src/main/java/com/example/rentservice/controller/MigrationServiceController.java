@@ -1,9 +1,11 @@
 package com.example.rentservice.controller;
 
+import com.example.rentservice.dto.CreateMigrationServiceRequest;
 import com.example.rentservice.service.MigrationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,9 +25,10 @@ public class MigrationServiceController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity createMigrationService(@RequestParam String name) {
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity createMigrationService(@RequestBody CreateMigrationServiceRequest request) {
         try {
-            return ResponseEntity.ok(migrationService.createMigrationService(name));
+            return ResponseEntity.ok(migrationService.createMigrationService(request));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

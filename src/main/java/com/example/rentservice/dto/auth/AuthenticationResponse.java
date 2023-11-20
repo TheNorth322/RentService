@@ -1,5 +1,6 @@
 package com.example.rentservice.dto.auth;
 
+import com.example.rentservice.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,4 +13,6 @@ import lombok.NoArgsConstructor;
 public class AuthenticationResponse {
     private String accessToken;
     private String refreshToken;
+    private String username;
+    private Role role;
 }

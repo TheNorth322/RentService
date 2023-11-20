@@ -1,5 +1,6 @@
 package com.example.rentservice.entity.building;
 
+import com.example.rentservice.entity.AddressEntity;
 import com.example.rentservice.entity.room.RoomEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -20,11 +21,9 @@ public class BuildingEntity {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "district_id", nullable = false)
-    private DistrictEntity district;
-
-    private String address;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id", referencedColumnName = "id")
+    private AddressEntity address;
 
     @Column(name = "floor_count")
     private Integer floorCount;

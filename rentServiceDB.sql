@@ -35,7 +35,7 @@ CREATE TABLE "entity_user" (
   "supervisor_first_name" varchar(20),
   "supervisor_last_name" varchar(20),
   "supervisor_surname" varchar(20),
-  "address" varchar(100),
+  "address_id" BIGINT,
   "bank_id" BIGINT,
   "checking_account" varchar(40),
   "itn_number" varchar(30)
@@ -81,8 +81,7 @@ CREATE TABLE "rooms" (
   "number" integer,
   "floor" integer,
   "price" integer,
-  "description" varchar(300),
-  "views" integer
+  "description" varchar(300)
 );
 
 CREATE TABLE "agreement_room" (
@@ -95,22 +94,17 @@ CREATE TABLE "agreement_room" (
   "rent_amount" integer
 );
 
-CREATE TABLE "districts" (
-  "id" BIGSERIAL PRIMARY KEY,
-  "name" varchar(30)
-);
-
 CREATE TABLE "buildings" (
   "id" BIGSERIAL PRIMARY KEY,
-  "district_id" BIGINT,
-  "address" varchar(30),
+  "address_id" BIGINT,
   "floor_count" integer,
   "telephone" varchar(30)
 );
 
 CREATE TABLE "migration_services" (
   "id" BIGSERIAL PRIMARY KEY,
-  "name" varchar(100)
+  "name" varchar,
+  "address_id" BIGINT
 );
 
 CREATE TABLE "passports" (
@@ -154,17 +148,23 @@ CREATE TABLE "banks" (
   "name" varchar
 );
 
+CREATE TABLE "addresses" (
+  "id" BIGSERIAL PRIMARY KEY,
+  "name" varchar,
+  "fias_id" varchar
+);
+
 ALTER TABLE "email_verif_tokens" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "password_reset_tokens" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+
+ALTER TABLE "refresh_tokens" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "user_rooms" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "user_rooms" ADD FOREIGN KEY ("room_id") REFERENCES "rooms" ("id");
 
 ALTER TABLE "room_images" ADD FOREIGN KEY ("room_id") REFERENCES "rooms" ("id");
-
-ALTER TABLE "buildings" ADD FOREIGN KEY ("district_id") REFERENCES "districts" ("id");
 
 ALTER TABLE "passports" ADD FOREIGN KEY ("migration_service_id") REFERENCES "migration_services" ("id");
 
@@ -189,3 +189,9 @@ ALTER TABLE "room_types" ADD FOREIGN KEY ("room_id") REFERENCES "rooms" ("id");
 ALTER TABLE "room_types" ADD FOREIGN KEY ("type_id") REFERENCES "types" ("id");
 
 ALTER TABLE "entity_user" ADD FOREIGN KEY ("bank_id") REFERENCES "banks" ("id");
+
+ALTER TABLE "migration_services" ADD FOREIGN KEY ("address_id") REFERENCES "addresses" ("id");
+
+ALTER TABLE "buildings" ADD FOREIGN KEY ("address_id") REFERENCES "addresses" ("id");
+
+ALTER TABLE "entity_user" ADD FOREIGN KEY ("address_id") REFERENCES "addresses" ("id");

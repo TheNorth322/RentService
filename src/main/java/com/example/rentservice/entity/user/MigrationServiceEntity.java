@@ -1,5 +1,6 @@
 package com.example.rentservice.entity.user;
 
+import com.example.rentservice.entity.AddressEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +21,10 @@ public class MigrationServiceEntity {
     private Long id;
 
     private String name;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id", referencedColumnName = "id")
+    private AddressEntity address;
 
     @OneToMany(mappedBy = "migrationService")
     private Set<PassportEntity> passports;
