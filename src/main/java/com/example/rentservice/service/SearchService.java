@@ -64,7 +64,7 @@ public class SearchService {
         return migrationService.getMigrationServicesByName(name);
     }
 
-    //TODO
+    /*TODO
     public List<AddressDto> searchAddresses(SearchAddressesRequest request) {
         HttpHeaders headers = new HttpHeaders();
 
@@ -76,5 +76,5 @@ public class SearchService {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.postForEntity(addressesUrl, request, String.class);
 
-    }
+    }*/
 }

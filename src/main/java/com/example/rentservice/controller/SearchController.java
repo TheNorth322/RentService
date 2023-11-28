@@ -41,12 +41,12 @@ public class SearchController {
         }
     }
 
-    @GetMapping("/addresses")
+    /*@GetMapping("/addresses")
     public ResponseEntity searchAdresses(@RequestBody SearchAddressesRequest request) {
         try {
             return ResponseEntity.ok(searchService.searchAddresses(request));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-    }
+    }*/
 }

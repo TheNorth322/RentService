@@ -72,6 +72,7 @@ public class AuthenticationService {
                 .emailVerified(false)
                 .role(request.getRole())
                 .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
 
@@ -105,9 +106,7 @@ public class AuthenticationService {
                 .user(user)
                 .build();
 
-        user.setEntityUser(entity);
-        userRepository.save(user);
-
+        entityUserRepository.save(entity);
         return response;
     }
 

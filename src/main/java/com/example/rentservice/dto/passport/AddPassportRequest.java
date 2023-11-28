@@ -1,5 +1,7 @@
 package com.example.rentservice.dto.passport;
 
+import com.example.rentservice.dto.AddressDto;
+import com.example.rentservice.dto.CreateAddressRequest;
 import com.example.rentservice.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,5 +25,5 @@ public class AddPassportRequest {
     private String number;
     private String series;
     private Gender gender;
-    private String placeOfBirth;
+    private CreateAddressRequest placeOfBirth;
 }

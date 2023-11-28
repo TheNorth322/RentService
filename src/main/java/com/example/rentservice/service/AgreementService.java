@@ -44,7 +44,7 @@ public class AgreementService {
                                 .startOfRent(room.getStartOfRent())
                                 .endOfRent(room.getEndOfRent())
                                 .purposeOfRent(room.getPurposeOfRent())
-                                .rentAmount()
+                                .rentAmount(123)
                                 .build();
                     } catch (RoomNotFoundException e) {
                         throw new RuntimeException(e);
@@ -69,7 +69,7 @@ public class AgreementService {
     }
 
     private Long generateRegistrationNumber() {
-        Optional<AgreementEntity> agreement = agreementRepository.findTopByRegistrationNumber();
+        Optional<AgreementEntity> agreement = agreementRepository.findTopByOrderByRegistrationNumberDesc();
         return agreement.map(agreementEntity -> agreementEntity.getRegistrationNumber() + 1).orElse(1L);
     }
 }

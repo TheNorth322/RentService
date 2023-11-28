@@ -27,7 +27,7 @@ public class SecurityConfiguration {
                         .requestMatchers("auth/**").permitAll()
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("").authenticated()
+                        .requestMatchers("/search/**", "/user/**", "/passport/**", "/room/**", "/building/**", "/agreement/**", "/migration_service/**", "/bank/**").authenticated()
                 )
                 .sessionManagement(authorize -> authorize
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

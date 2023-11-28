@@ -43,6 +43,6 @@ public class AgreementEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "agreement")
     private Set<AgreementRoomEntity> rents;
 }

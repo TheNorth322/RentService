@@ -1,5 +1,6 @@
 package com.example.rentservice.entity.user;
 
+import com.example.rentservice.entity.AddressEntity;
 import com.example.rentservice.entity.user.IndividualUserEntity;
 import com.example.rentservice.enums.Gender;
 import jakarta.persistence.*;
@@ -40,8 +41,9 @@ public class PassportEntity {
     @JoinColumn(name = "migration_service_id", nullable = false)
     private MigrationServiceEntity migrationService;
 
-    @Column(name = "place_of_birth")
-    private String placeOfBirth;
+    @ManyToOne
+    @JoinColumn(name="address_id", nullable = false)
+    private AddressEntity placeOfBirth;
 
     private String number;
 

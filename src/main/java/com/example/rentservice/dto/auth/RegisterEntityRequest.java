@@ -1,5 +1,6 @@
 package com.example.rentservice.dto.auth;
 
+import com.example.rentservice.dto.AddressDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +16,7 @@ public class RegisterEntityRequest {
     private String supervisorFirstName;
     private String supervisorLastName;
     private String supervisorSurname;
-    private String address;
+    private AddressDto address;
     private Long bankId;
     private String checkingAccount;
     private String itnNumber;

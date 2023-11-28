@@ -1,13 +1,17 @@
 package com.example.rentservice.entity;
 
 import com.example.rentservice.entity.building.BuildingEntity;
+import com.example.rentservice.entity.user.EntityUserEntity;
 import com.example.rentservice.entity.user.IndividualUserEntity;
 import com.example.rentservice.entity.user.MigrationServiceEntity;
+import com.example.rentservice.entity.user.PassportEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Set;
 
 @Entity
 @Data
@@ -29,7 +33,10 @@ public class AddressEntity {
     private MigrationServiceEntity migrationService;
 
     @OneToOne(mappedBy = "address")
-    private IndividualUserEntity individualUser;
+    private EntityUserEntity entityUser;
+
+    @OneToMany(mappedBy = "placeOfBirth")
+    private Set<PassportEntity> passports;
 
     @OneToOne(mappedBy = "address")
     private BuildingEntity building;

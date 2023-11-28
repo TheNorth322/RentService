@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @Builder
@@ -14,6 +15,6 @@ import java.time.LocalDateTime;
 public class CreateAgreementRoomDto {
     private Long roomId;
     private String purposeOfRent;
-    private LocalDateTime startOfRent;
-    private LocalDateTime endOfRent;
+    private Date startOfRent;
+    private Date endOfRent;
 }

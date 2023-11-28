@@ -1,4 +1,4 @@
-package com.example.rentservice.dto;
+package com.example.rentservice.dto.bank;
 
 import com.example.rentservice.entity.BankEntity;
 import lombok.AllArgsConstructor;

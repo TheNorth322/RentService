@@ -3,6 +3,7 @@ package com.example.rentservice.service;
 import com.example.rentservice.dto.IndividualUserDto;
 import com.example.rentservice.dto.passport.AddPassportRequest;
 import com.example.rentservice.dto.passport.PassportDto;
+import com.example.rentservice.entity.AddressEntity;
 import com.example.rentservice.entity.user.IndividualUserEntity;
 import com.example.rentservice.entity.user.MigrationServiceEntity;
 import com.example.rentservice.entity.user.PassportEntity;
@@ -11,21 +12,22 @@ import com.example.rentservice.exception.MigrationServiceNotFoundException;
 import com.example.rentservice.exception.auth.IndividualUserNotFoundException;
 import com.example.rentservice.exception.auth.UserNotFoundException;
 import com.example.rentservice.exception.passport.PassportNotFoundException;
-import com.example.rentservice.repository.IndividualUserRepository;
-import com.example.rentservice.repository.MigrationServiceRepository;
-import com.example.rentservice.repository.PassportRepository;
-import com.example.rentservice.repository.UserRepository;
+import com.example.rentservice.repository.*;
 import lombok.SneakyThrows;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PassportService {
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private AddressRepository addressRepository;
 
     @Autowired
     private IndividualUserRepository individualUserRepository;
@@ -66,6 +68,11 @@ public class PassportService {
     public IndividualUserEntity addPassport(AddPassportRequest request) throws UserNotFoundException, MigrationServiceNotFoundException {
         validateRequest(request);
         IndividualUserEntity user = individualUserRepository.findByUser_Username(request.getUsername()).orElseThrow(() -> new UserNotFoundException("User not found"));
+        AddressEntity address = addressRepository.findByFiasId(request.getPlaceOfBirth().getFiasId()).orElseGet(() -> addressRepository.save(AddressEntity
+                .builder()
+                .name(request.getPlaceOfBirth().getName())
+                .fiasId(request.getPlaceOfBirth().getFiasId())
+                .build()));
 
         MigrationServiceEntity migrationService = migrationServiceRepository.findById(request.getMigrationServiceId())
                 .orElseThrow(() -> new MigrationServiceNotFoundException("Migration service not found"));
@@ -81,7 +88,7 @@ public class PassportService {
                 .gender(request.getGender())
                 .number(request.getNumber())
                 .series(request.getSeries())
-                .placeOfBirth(request.getPlaceOfBirth())
+                .placeOfBirth(address)
                 .migrationService(migrationService)
                 .build();
 

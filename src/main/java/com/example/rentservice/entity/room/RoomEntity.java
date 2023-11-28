@@ -31,6 +31,7 @@ public class RoomEntity {
     private Integer number;
 
     private Integer floor;
+    private Integer price;
 
     @ManyToMany
     @JoinTable(

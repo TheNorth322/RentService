@@ -1,5 +1,6 @@
 package com.example.rentservice.dto.passport;
 
+import com.example.rentservice.dto.AddressDto;
 import com.example.rentservice.dto.MigrationServiceDto;
 import com.example.rentservice.entity.user.PassportEntity;
 import com.example.rentservice.enums.Gender;
@@ -38,7 +39,7 @@ public class PassportDto {
                 .number(entity.getNumber())
                 .series(entity.getSeries())
                 .gender(entity.getGender())
-                .placeOfBirth(entity.getPlaceOfBirth())
+                .placeOfBirth(entity.getPlaceOfBirth().getName())
                 .build();
     }
 }

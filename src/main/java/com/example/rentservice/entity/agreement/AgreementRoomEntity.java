@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -22,7 +21,7 @@ public class AgreementRoomEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "agreement_id")
+    @JoinColumn(name = "agreement_id", nullable = false)
     private AgreementEntity agreement;
 
     @ManyToOne

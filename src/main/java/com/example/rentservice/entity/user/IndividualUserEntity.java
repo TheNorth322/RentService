@@ -1,5 +1,6 @@
 package com.example.rentservice.entity.user;
 
+import com.example.rentservice.entity.AddressEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
