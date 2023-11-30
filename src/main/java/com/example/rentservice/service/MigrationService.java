@@ -45,7 +45,13 @@ public class MigrationService {
             throw new MigrationServiceExistsException("Migration service already exists");
         }
         try {
-            AddressEntity address = addressService.createAddress(CreateAddressRequest.builder().name(request.getName()).fiasId(request.getFiasId()).build());
+            AddressEntity address = addressService.createAddress(
+                    CreateAddressRequest
+                            .builder()
+                            .name(request.getName())
+                            .addressParts(request.getAddressParts())
+                            .build()
+            );
             return MigrationServiceDto.toDto(migrationServiceRepository.save(
                     MigrationServiceEntity
                             .builder()
@@ -54,7 +60,7 @@ public class MigrationService {
                             .build()
            ));
         } catch (AddressAlreadyExistsException e) {
-            AddressEntity address = addressService.findByFiasId(request.getFiasId());
+            AddressEntity address = addressService.findByName(request.getName(), request.getAddressParts());
             return MigrationServiceDto.toDto(migrationServiceRepository.save(
                     MigrationServiceEntity
                             .builder()

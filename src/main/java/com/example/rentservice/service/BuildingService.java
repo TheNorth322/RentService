@@ -24,7 +24,7 @@ public class BuildingService {
     private AddressService addressService;
 
     public BuildingDto createBuilding(CreateBuildingRequest request) throws AddressNotFoundException, BuildingAlreadyExistsException {
-        AddressEntity address = addressService.findByFiasId(request.getFiasId());
+        AddressEntity address = addressService.findByName(request.getAddress(), request.getAddressParts());
 
         if (buildingRepository.findByAddress(address).isPresent())
             throw new BuildingAlreadyExistsException("Building already exists");

@@ -11,8 +11,6 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateMigrationServiceRequest {
-    private String name;
-    private String addressName;
-    private List<AddressPartDto> addressParts;
+public class ApiResponse {
+    private List<AddressDto> addresses;
 }

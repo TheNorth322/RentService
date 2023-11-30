@@ -1,4 +1,24 @@
 -- Типы данных
+CREATE TYPE "address_level" AS ENUM (
+  'RF_SUBJECT',
+  'ADMINISTRATIVE_DISTRICT',
+  'MUNICIPAL_DISTRICT',
+  'URBAN_SETTLEMENT',
+  'CITY',
+  'LOCALITY',
+  'PLANNING_STRUCTURE_ELEMENT',
+  'ROAD_NETWORK_ELEMENT',
+  'LAND_PLOT',
+  'BUILDING',
+  'ROOM',
+  'ROOM_IN_ROOM',
+  'AUTONOMOUS_OKRUG',
+  'INTRACITY_LEVEL',
+  'ADDITIONAL_TERRITORY',
+  'OBJECTS_IN_AT',
+  'PARKING_SPACE'
+);
+
 CREATE TYPE "role" AS ENUM (
   'INDIVIDUAL',
   'ENTITY',
@@ -28,8 +48,7 @@ CREATE TABLE "banks" (
 
 CREATE TABLE "addresses" (
   "id" BIGSERIAL PRIMARY KEY,
-  "name" varchar NOT NULL,
-  "fias_id" varchar NOT NULL
+  "name" varchar NOT NULL
 );
 
 CREATE TABLE "migration_services" (
@@ -164,7 +183,25 @@ CREATE TABLE "refresh_tokens" (
   "expiry_date" TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
+CREATE TABLE "address_parts" (
+  "id" BIGSERIAL PRIMARY KEY,
+  "object_guid" varchar,
+  "name" varchar,
+  "type_name" varchar,
+  "full_type_name" varchar,
+  "level" address_level
+);
+
+CREATE TABLE "address_address_parts"(
+  "address_id" BIGINT,
+  "address_part_id" BIGINT
+);
+
 -- Внешние ключи
+ALTER TABLE "address_address_parts" ADD FOREIGN KEY ("address_id") REFERENCES "addresses" ("id");
+
+ALTER TABLE "address_address_parts" ADD FOREIGN KEY ("address_part_id") REFERENCES "address_parts" ("id");
+
 ALTER TABLE "email_verif_tokens" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "password_reset_tokens" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
@@ -210,54 +247,54 @@ ALTER TABLE "buildings" ADD FOREIGN KEY ("address_id") REFERENCES "addresses" ("
 ALTER TABLE "entity_user" ADD FOREIGN KEY ("address_id") REFERENCES "addresses" ("id");
 
 -- Типы, банки, адреса, миграционные службы
-INSERT INTO "types" ("text") VALUES ('Type1'), ('Type2'), ('Type3');
-INSERT INTO "banks" ("name") VALUES ('Bank1'), ('Bank2'), ('Bank3');
-INSERT INTO "addresses" ("name", "fias_id") VALUES ('Address1', 'FiasId1'), ('Address2', 'FiasId2'), ('Address3', 'FiasId3');
-INSERT INTO "migration_services" ("name", "address_id") VALUES ('Service1', 1), ('Service2', 2), ('Service3', 3);
+-- INSERT INTO "types" ("text") VALUES ('Type1'), ('Type2'), ('Type3');
+-- INSERT INTO "banks" ("name") VALUES ('Bank1'), ('Bank2'), ('Bank3');
+-- INSERT INTO "addresses" ("name") VALUES ('Address1'), ('Address2'), ('Address3');
+-- INSERT INTO "migration_services" ("name", "address_id") VALUES ('Service1', 1), ('Service2', 2), ('Service3', 3);
 
--- Пользователи, здания, типы комнат
-INSERT INTO "users" ("username", "email", "email_verified", "password", "phone_number", "role") VALUES
-('User1', 'user1@email.com', true, 'password1', '1234567890', 'INDIVIDUAL'),
-('User2', 'user2@email.com', true, 'password2', '0987654321', 'ENTITY'),
-('User3', 'user3@email.com', true, 'password3', '1122334455', 'ADMIN');
+-- -- Пользователи, здания, типы комнат
+-- INSERT INTO "users" ("username", "email", "email_verified", "password", "phone_number", "role") VALUES
+-- ('User1', 'user1@email.com', true, 'password1', '1234567890', 'INDIVIDUAL'),
+-- ('User2', 'user2@email.com', true, 'password2', '0987654321', 'ENTITY'),
+-- ('User3', 'user3@email.com', true, 'password3', '1122334455', 'ADMIN');
 
-INSERT INTO "buildings" ("address_id", "floor_count", "telephone") VALUES (1, 5, '123-456-789'), (2, 10, '987-654-321'), (3, 8, '111-222-333');
+-- INSERT INTO "buildings" ("address_id", "floor_count", "telephone") VALUES (1, 5, '123-456-789'), (2, 10, '987-654-321'), (3, 8, '111-222-333');
 
--- Комнаты, пользователи-юридические лица, пользователи-физические лица, паспорта
-INSERT INTO "rooms" ("building_id", "telephone", "area", "number", "floor", "price", "description") VALUES
-(1, true, 25.5, 101, 1, 500, 'Description1'),
-(2, false, 30.0, 201, 2, 700, 'Description2'),
-(3, true, 40.2, 301, 3, 1000, 'Description3');
+-- -- Комнаты, пользователи-юридические лица, пользователи-физические лица, паспорта
+-- INSERT INTO "rooms" ("building_id", "telephone", "area", "number", "floor", "price", "description") VALUES
+-- (1, true, 25.5, 101, 1, 500, 'Description1'),
+-- (2, false, 30.0, 201, 2, 700, 'Description2'),
+-- (3, true, 40.2, 301, 3, 1000, 'Description3');
 
-INSERT INTO "room_types" ("room_id", "type_id") VALUES (1, 1), (2, 2), (3, 3);
+-- INSERT INTO "room_types" ("room_id", "type_id") VALUES (1, 1), (2, 2), (3, 3);
 
-INSERT INTO "entity_user" ("user_id", "name", "supervisor_first_name", "supervisor_last_name", "supervisor_surname", "address_id", "bank_id", "checking_account", "itn_number") VALUES
-(2, 'EntityName1', 'SupervisorFirstName1', 'SupervisorLastName1', 'SupervisorSurname1', 1, 1, '12345678901234567890', '123456789012345');
+-- INSERT INTO "entity_user" ("user_id", "name", "supervisor_first_name", "supervisor_last_name", "supervisor_surname", "address_id", "bank_id", "checking_account", "itn_number") VALUES
+-- (2, 'EntityName1', 'SupervisorFirstName1', 'SupervisorLastName1', 'SupervisorSurname1', 1, 1, '12345678901234567890', '123456789012345');
 
-INSERT INTO "passports" ("user_id", "first_name", "last_name", "surname", "date_of_birth", "date_of_issue", "migration_service_id", "number", "series", "gender", "place_of_birth") VALUES
-(1, 'FirstName1', 'LastName1', 'Surname1', '1990-01-01', '2020-01-01', 1, '123456', 'AB', 'MALE', 'City1'),
-(2, 'FirstName2', 'LastName2', 'Surname2', '1985-05-15', '2019-05-15', 2, '654321', 'CD', 'FEMALE', 'City2'),
-(3, 'FirstName3', 'LastName3', 'Surname3', '1998-12-30', '2021-12-30', 3, '987654', 'EF', 'MALE', 'City3');
+-- INSERT INTO "passports" ("user_id", "first_name", "last_name", "surname", "date_of_birth", "date_of_issue", "migration_service_id", "number", "series", "gender", "address_id") VALUES
+-- (1, 'FirstName1', 'LastName1', 'Surname1', '1990-01-01', '2020-01-01', 1, '123456', 'AB', 'MALE', 1),
+-- (2, 'FirstName2', 'LastName2', 'Surname2', '1985-05-15', '2019-05-15', 2, '654321', 'CD', 'FEMALE', 2),
+-- (3, 'FirstName3', 'LastName3', 'Surname3', '1998-12-30', '2021-12-30', 3, '987654', 'EF', 'MALE', 3);
 
-INSERT INTO "individual_user" ("user_id", "active_passport_id") VALUES (1, 1);
+-- INSERT INTO "individual_user" ("user_id", "active_passport_id") VALUES (1, 1);
 
--- Договоры
-INSERT INTO "agreements" ("user_id", "registration_number", "payment_frequency", "additional_conditions", "fine", "starts_from", "lasts_to") VALUES
-(1, 1001, 'MONTHLY', 'Condition1', 50, '2022-01-01', '2023-01-01'),
-(2, 1002, 'QUARTERLY', 'Condition2', 30, '2022-02-01', '2023-02-01'),
-(3, 1003, 'MONTHLY', 'Condition3', 40, '2022-03-01', '2023-03-01');
+-- -- Договоры
+-- INSERT INTO "agreements" ("user_id", "registration_number", "payment_frequency", "additional_conditions", "fine", "starts_from", "lasts_to") VALUES
+-- (1, 1001, 'MONTHLY', 'Condition1', 50, '2022-01-01', '2023-01-01'),
+-- (2, 1002, 'QUARTERLY', 'Condition2', 30, '2022-02-01', '2023-02-01'),
+-- (3, 1003, 'MONTHLY', 'Condition3', 40, '2022-03-01', '2023-03-01');
 
--- Пользователи-комнаты, изображения комнат, комнаты-договоры
-INSERT INTO "user_rooms" ("user_id", "room_id") VALUES (1, 1), (2, 2), (3, 3);
+-- -- Пользователи-комнаты, изображения комнат, комнаты-договоры
+-- INSERT INTO "user_rooms" ("user_id", "room_id") VALUES (1, 1), (2, 2), (3, 3);
 
-INSERT INTO "room_images" ("room_id", "url") VALUES (1, 'image1.jpg'), (2, 'image2.jpg'), (3, 'image3.jpg');
+-- INSERT INTO "room_images" ("room_id", "url") VALUES (1, 'image1.jpg'), (2, 'image2.jpg'), (3, 'image3.jpg');
 
-INSERT INTO "agreement_room" ("agreement_id", "room_id", "purpose_of_rent", "start_of_rent", "end_of_rent", "rent_amount") VALUES
-(1, 1, 'Purpose1', '2022-01-01', '2022-12-31', 500),
-(2, 2, 'Purpose2', '2022-02-01', '2022-05-01', 700),
-(3, 3, 'Purpose3', '2022-03-01', '2022-06-01', 1000);
+-- INSERT INTO "agreement_room" ("agreement_id", "room_id", "purpose_of_rent", "start_of_rent", "end_of_rent", "rent_amount") VALUES
+-- (1, 1, 'Purpose1', '2022-01-01', '2022-12-31', 500),
+-- (2, 2, 'Purpose2', '2022-02-01', '2022-05-01', 700),
+-- (3, 3, 'Purpose3', '2022-03-01', '2022-06-01', 1000);
 
--- Токены
-INSERT INTO "email_verif_tokens" ("user_id", "token", "expiry_date") VALUES (1, 'verification_token1', '2022-01-02'), (2, 'verification_token2', '2022-02-02');
-INSERT INTO "password_reset_tokens" ("user_id", "token", "expiry_date") VALUES (1, 'reset_token1', '2022-01-15'), (2, 'reset_token2', '2022-02-15');
-INSERT INTO "refresh_tokens" ("user_id", "token", "expiry_date") VALUES (1, 'refresh_token1', '2022-12-31'), (2, 'refresh_token2', '2022-12-31');
+-- -- Токены
+-- INSERT INTO "email_verif_tokens" ("user_id", "token", "expiry_date") VALUES (1, 'verification_token1', '2022-01-02'), (2, 'verification_token2', '2022-02-02');
+-- INSERT INTO "password_reset_tokens" ("user_id", "token", "expiry_date") VALUES (1, 'reset_token1', '2022-01-15'), (2, 'reset_token2', '2022-02-15');
+-- INSERT INTO "refresh_tokens" ("user_id", "token", "expiry_date") VALUES (1, 'refresh_token1', '2022-12-31'), (2, 'refresh_token2', '2022-12-31');

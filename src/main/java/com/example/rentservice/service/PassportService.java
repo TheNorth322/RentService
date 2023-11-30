@@ -1,9 +1,11 @@
 package com.example.rentservice.service;
 
+import com.example.rentservice.dto.AddressPartDto;
 import com.example.rentservice.dto.IndividualUserDto;
 import com.example.rentservice.dto.passport.AddPassportRequest;
 import com.example.rentservice.dto.passport.PassportDto;
 import com.example.rentservice.entity.AddressEntity;
+import com.example.rentservice.entity.AddressPartEntity;
 import com.example.rentservice.entity.user.IndividualUserEntity;
 import com.example.rentservice.entity.user.MigrationServiceEntity;
 import com.example.rentservice.entity.user.PassportEntity;
@@ -20,11 +22,15 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PassportService {
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private AddressPartRepository addressPartRepository;
 
     @Autowired
     private AddressRepository addressRepository;
@@ -68,10 +74,11 @@ public class PassportService {
     public IndividualUserEntity addPassport(AddPassportRequest request) throws UserNotFoundException, MigrationServiceNotFoundException {
         validateRequest(request);
         IndividualUserEntity user = individualUserRepository.findByUser_Username(request.getUsername()).orElseThrow(() -> new UserNotFoundException("User not found"));
-        AddressEntity address = addressRepository.findByFiasId(request.getPlaceOfBirth().getFiasId()).orElseGet(() -> addressRepository.save(AddressEntity
+
+        AddressEntity address = addressRepository.findByName(request.getPlaceOfBirth().getName()).orElseGet(() -> addressRepository.save(AddressEntity
                 .builder()
                 .name(request.getPlaceOfBirth().getName())
-                .fiasId(request.getPlaceOfBirth().getFiasId())
+                .addressParts(request.getPlaceOfBirth().getAddressParts().stream().map(this::getAddressPart).collect(Collectors.toSet()))
                 .build()));
 
         MigrationServiceEntity migrationService = migrationServiceRepository.findById(request.getMigrationServiceId())
@@ -97,6 +104,19 @@ public class PassportService {
         return individualUserRepository.save(user.addPassport(passport));
     }
 
+    private AddressPartEntity getAddressPart(AddressPartDto addressPartDto) {
+        return addressPartRepository.findByObjectGuid(addressPartDto.getObjectGuid()).orElse(
+                addressPartRepository.save(AddressPartEntity
+                        .builder()
+                                .fullTypeName(addressPartDto.getFullTypeName())
+                                .level(addressPartDto.getLevel())
+                                .typeName(addressPartDto.getTypeName())
+                                .objectGuid(addressPartDto.getObjectGuid())
+                                .name(addressPartDto.getName())
+                        .build()
+                )
+        );
+    }
     private void validateRequest(AddPassportRequest request) {
         //TODO
     }

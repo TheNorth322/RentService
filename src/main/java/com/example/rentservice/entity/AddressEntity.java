@@ -24,9 +24,6 @@ public class AddressEntity {
     @GeneratedValue
     private Long id;
 
-    @Column(name = "fias_id")
-    private String fiasId;
-
     private String name;
 
     @OneToOne(mappedBy = "address")
@@ -40,4 +37,12 @@ public class AddressEntity {
 
     @OneToOne(mappedBy = "address")
     private BuildingEntity building;
+
+    @ManyToMany
+    @JoinTable(
+            name = "address_address_parts",
+            joinColumns = @JoinColumn(name = "address_id"),
+            inverseJoinColumns = @JoinColumn(name = "address_part_id")
+    )
+    private Set<AddressPartEntity> addressParts;
 }
