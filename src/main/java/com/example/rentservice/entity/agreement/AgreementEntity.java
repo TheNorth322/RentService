@@ -26,6 +26,7 @@ public class AgreementEntity {
     private Long registrationNumber;
 
     @Column(name = "payment_frequency")
+    @Enumerated(EnumType.STRING)
     private PaymentFrequency paymentFrequency;
 
     private Integer fine;

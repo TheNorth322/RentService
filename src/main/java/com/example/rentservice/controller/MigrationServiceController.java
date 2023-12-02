@@ -1,6 +1,7 @@
 package com.example.rentservice.controller;
 
 import com.example.rentservice.dto.CreateMigrationServiceRequest;
+import com.example.rentservice.dto.migrationService.UpdateMigrationServiceRequest;
 import com.example.rentservice.service.MigrationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,5 +33,27 @@ public class MigrationServiceController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    //TODO
+    @PutMapping("/update")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity updateMigrationService(@RequestBody UpdateMigrationServiceRequest request) {
+        try {
+            return ResponseEntity.ok(migrationService.updateMigrationService(request));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    //TODO
+    @PutMapping("/delete")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity deleteMigrationService(@RequestParam long id) {
+        try {
+            return ResponseEntity.ok(migrationService.deleteMigrationService(id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
     }
 }

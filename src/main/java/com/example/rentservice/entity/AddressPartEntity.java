@@ -31,6 +31,7 @@ public class AddressPartEntity {
     @Column(name = "full_type_name")
     private String fullTypeName;
 
+    @Enumerated(EnumType.STRING)
     private AddressLevel level;
 
     @ManyToMany(mappedBy = "addressParts")

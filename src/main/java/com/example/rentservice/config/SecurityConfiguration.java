@@ -24,10 +24,10 @@ public class SecurityConfiguration {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("auth/**").permitAll()
+                        .requestMatchers("auth/**", "/search/**").permitAll()
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/search/**", "/user/**", "/passport/**", "/room/**", "/building/**", "/agreement/**", "/migration_service/**", "/bank/**").authenticated()
+                        .requestMatchers( "/user/**","/passport/**", "/room/**", "/building/**", "/agreement/**", "/migration_service/**", "/bank/**").authenticated()
                 )
                 .sessionManagement(authorize -> authorize
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

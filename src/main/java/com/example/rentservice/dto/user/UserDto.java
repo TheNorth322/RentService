@@ -24,6 +24,8 @@ public class UserDto {
                 .builder()
                 .id(entity.getId())
                 .username(entity.getUsername())
+                .email(entity.getEmail())
+                .phoneNumber(entity.getPhoneNumber())
                 .emailVerified(entity.isEmailVerified())
                 .role(entity.getRole())
                 .build();

@@ -118,8 +118,8 @@ public class AuthenticationService {
                 .builder()
                 .user(user)
                 .build());
-        passportService.addPassport(request.getAddPassportRequest());
 
+        passportService.addPassport(request.getAddPassportRequest());
         return response;
     }
 

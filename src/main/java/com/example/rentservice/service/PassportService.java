@@ -75,7 +75,7 @@ public class PassportService {
         validateRequest(request);
         IndividualUserEntity user = individualUserRepository.findByUser_Username(request.getUsername()).orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        AddressEntity address = addressRepository.findByName(request.getPlaceOfBirth().getName()).orElseGet(() -> addressRepository.save(AddressEntity
+        AddressEntity address = addressRepository.findByName(request.getPlaceOfBirth().getName()).orElse(addressRepository.save(AddressEntity
                 .builder()
                 .name(request.getPlaceOfBirth().getName())
                 .addressParts(request.getPlaceOfBirth().getAddressParts().stream().map(this::getAddressPart).collect(Collectors.toSet()))
@@ -83,6 +83,7 @@ public class PassportService {
 
         MigrationServiceEntity migrationService = migrationServiceRepository.findById(request.getMigrationServiceId())
                 .orElseThrow(() -> new MigrationServiceNotFoundException("Migration service not found"));
+
 
         PassportEntity passport = PassportEntity
                 .builder()
@@ -99,8 +100,7 @@ public class PassportService {
                 .migrationService(migrationService)
                 .build();
 
-        migrationServiceRepository.save(migrationService.addPassport(passport));
-
+        passportRepository.save(passport);
         return individualUserRepository.save(user.addPassport(passport));
     }
 

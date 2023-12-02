@@ -49,4 +49,12 @@ public class SearchController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    @GetMapping("/migrationServices/all")
+    public ResponseEntity searchMigrationServices() {
+        try {
+            return ResponseEntity.ok(searchService.searchMigrationServices());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

@@ -86,4 +86,7 @@ public class SearchService {
         return objectMapper.readValue(jsonString, AddressDto[].class);
     }
 
+    public List<MigrationServiceDto> searchMigrationServices() {
+        return migrationService.getMigrationServices();
+    }
 }

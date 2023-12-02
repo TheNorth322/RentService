@@ -15,12 +15,14 @@ public class MigrationServiceDto {
     private Long id;
 
     private String name;
+    private AddressDto address;
 
     public static MigrationServiceDto toDto(MigrationServiceEntity entity) {
         return MigrationServiceDto
                 .builder()
                 .id(entity.getId())
                 .name(entity.getName())
+                .address(AddressDto.toDto(entity.getAddress()))
                 .build();
     }
 }
