@@ -6,10 +6,7 @@ import com.example.rentservice.entity.user.IndividualUserEntity;
 import com.example.rentservice.entity.user.MigrationServiceEntity;
 import com.example.rentservice.entity.user.PassportEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Set;
 
@@ -19,6 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 @Table(name = "addresses")
+@EqualsAndHashCode(exclude = {"migrationService", "entityUser", "passports", "building", "addressParts"})
 public class AddressEntity {
     @Id
     @GeneratedValue

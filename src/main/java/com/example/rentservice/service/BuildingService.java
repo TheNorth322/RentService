@@ -1,5 +1,6 @@
 package com.example.rentservice.service;
 
+import com.example.rentservice.dto.CreateAddressRequest;
 import com.example.rentservice.dto.building.BuildingDto;
 import com.example.rentservice.dto.building.CreateBuildingRequest;
 import com.example.rentservice.dto.room.RoomDto;
@@ -24,7 +25,7 @@ public class BuildingService {
     private AddressService addressService;
 
     public BuildingDto createBuilding(CreateBuildingRequest request) throws AddressNotFoundException, BuildingAlreadyExistsException {
-        AddressEntity address = addressService.findByName(request.getAddress(), request.getAddressParts());
+        AddressEntity address = addressService.createAddress(new CreateAddressRequest(request.getAddress(), request.getAddressParts()));
 
         if (buildingRepository.findByAddress(address).isPresent())
             throw new BuildingAlreadyExistsException("Building already exists");

@@ -3,6 +3,7 @@ package com.example.rentservice.controller;
 import com.example.rentservice.dto.room.AddRoomTypesToRoomRequest;
 import com.example.rentservice.dto.room.CreateRoomRequest;
 import com.example.rentservice.dto.room.CreateRoomTypeRequest;
+import com.example.rentservice.dto.room.UpdateRoomTypeRequest;
 import com.example.rentservice.service.RoomService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,26 @@ public class RoomController {
     public ResponseEntity createRoomType(@RequestBody CreateRoomTypeRequest request) {
         try {
             return ResponseEntity.ok(roomService.createRoomType(request));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/type/update")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity updateRoomType(@RequestBody UpdateRoomTypeRequest request) {
+        try {
+            return ResponseEntity.ok(roomService.updateRoomType(request));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/type/delete")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity updateRoomType(@RequestParam Long id) {
+        try {
+            return ResponseEntity.ok(roomService.deleteRoomType(id));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

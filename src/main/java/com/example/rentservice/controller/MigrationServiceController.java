@@ -35,7 +35,6 @@ public class MigrationServiceController {
         }
     }
 
-    //TODO
     @PutMapping("/update")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity updateMigrationService(@RequestBody UpdateMigrationServiceRequest request) {
@@ -45,7 +44,6 @@ public class MigrationServiceController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    //TODO
     @PutMapping("/delete")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity deleteMigrationService(@RequestParam long id) {

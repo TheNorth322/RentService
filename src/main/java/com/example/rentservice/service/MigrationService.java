@@ -37,43 +37,30 @@ public class MigrationService {
                 .map(MigrationServiceDto::toDto)
                 .toList();
     }
-    public String createMigrationService(CreateMigrationServiceRequest request) throws MigrationServiceExistsException, AddressNotFoundException {
+    public MigrationServiceDto createMigrationService(CreateMigrationServiceRequest request) throws MigrationServiceExistsException, AddressNotFoundException {
 
         if (migrationServiceRepository.findByName(request.getName()).isPresent()) {
             throw new MigrationServiceExistsException("Migration service already exists");
         }
-        try {
-            AddressEntity address = addressService.createAddress(
-                    CreateAddressRequest
-                            .builder()
-                            .name(request.getName())
+
+        AddressEntity address = addressService.createAddress(
+                    CreateAddressRequest.builder()
+                            .name(request.getAddressName())
                             .addressParts(request.getAddressParts())
                             .build()
             );
-            migrationServiceRepository.save(
-                    MigrationServiceEntity
-                            .builder()
-                            .name(request.getName())
-                            .address(address)
-                            .build()
 
-            );
-            return "Migration service create successfully";
-        } catch (AddressAlreadyExistsException e) {
-            AddressEntity address = addressService.findByName(request.getName(), request.getAddressParts());
-            migrationServiceRepository.save(
-                    MigrationServiceEntity
-                            .builder()
-                            .name(request.getName())
-                            .address(address)
-                            .build());
-            return "Migration service create successfully";
-        }
+        return MigrationServiceDto.toDto(migrationServiceRepository.save(
+                MigrationServiceEntity.builder()
+                        .name(request.getName())
+                        .address(address)
+                        .build())
+        );
     }
 
     public String updateMigrationService(UpdateMigrationServiceRequest request) throws MigrationServiceNotFoundException, AddressNotFoundException {
         MigrationServiceEntity migrationService = migrationServiceRepository.findById(request.getId()).orElseThrow(() -> new MigrationServiceNotFoundException("Migration service not found"));
-        AddressEntity address = addressService.findByName(request.getAddressName(), request.getAddressParts());
+        AddressEntity address = addressService.createAddress(new CreateAddressRequest(request.getAddressName(), request.getAddressParts()));
 
         migrationService.setName(request.getName());
         migrationService.setAddress(address);

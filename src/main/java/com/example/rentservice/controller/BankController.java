@@ -1,6 +1,7 @@
 package com.example.rentservice.controller;
 
 import com.example.rentservice.dto.bank.CreateBankRequest;
+import com.example.rentservice.dto.bank.UpdateBankRequest;
 import com.example.rentservice.service.BankService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,26 @@ public class BankController {
     public ResponseEntity createBank(@RequestBody CreateBankRequest request) {
         try {
             return ResponseEntity.ok(bankService.createBank(request));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/update")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity updateBank(@RequestBody UpdateBankRequest request) {
+        try {
+            return ResponseEntity.ok(bankService.updateBank(request));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/delete")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity deleteBank(@RequestParam Long id) {
+        try {
+            return ResponseEntity.ok(bankService.deleteBank(id));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

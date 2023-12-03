@@ -185,7 +185,7 @@ CREATE TABLE "refresh_tokens" (
 
 CREATE TABLE "address_parts" (
   "id" BIGSERIAL PRIMARY KEY,
-  "object_guid" varchar,
+  "object_guid" varchar UNIQUE,
   "name" varchar,
   "type_name" varchar,
   "full_type_name" varchar,

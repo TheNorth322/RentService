@@ -7,6 +7,7 @@ import com.example.rentservice.exception.TypeExistsException;
 import com.example.rentservice.exception.building.BuildingNotFoundException;
 import com.example.rentservice.exception.TypeNotFoundException;
 import com.example.rentservice.exception.room.RoomNotFoundException;
+import com.example.rentservice.exception.room.RoomTypeNotFoundException;
 import com.example.rentservice.repository.BuildingRepository;
 import com.example.rentservice.repository.RoomRepository;
 import com.example.rentservice.repository.TypeRepository;
@@ -81,5 +82,22 @@ public class RoomService {
 
     public List<TypeDto> getAllTypes() {
         return typeRepository.findAll().stream().map(TypeDto::toDto).toList();
+    }
+
+    public String updateRoomType(UpdateRoomTypeRequest request) throws RoomTypeNotFoundException {
+        TypeEntity type = typeRepository.findById(request.getId()).orElseThrow(() -> new RoomTypeNotFoundException("Room type not found"));
+
+        type.setText(request.getText());
+        typeRepository.save(type);
+
+        return "Type was updated successfully";
+    }
+
+    public String deleteRoomType(Long id) throws RoomTypeNotFoundException {
+        TypeEntity type = typeRepository.findById(id).orElseThrow(() -> new RoomTypeNotFoundException("Room type not found"));
+
+        typeRepository.delete(type);
+
+        return "Type was deleted successfully";
     }
 }

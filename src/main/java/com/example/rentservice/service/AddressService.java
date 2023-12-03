@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,36 +27,29 @@ public class AddressService {
     @Autowired
     private AddressPartRepository addressPartRepository;
 
-    public AddressEntity createAddress(CreateAddressRequest request) throws AddressAlreadyExistsException {
-        if (addressRepository.findByName(request.getName()).isPresent())
-            throw new AddressAlreadyExistsException("Address already exists");
-
-        return addressRepository.save(AddressEntity
-                .builder()
-                .name(request.getName())
-                .addressParts(request.getAddressParts().stream().map(this::getAddressPart).collect(Collectors.toSet()))
-                .build());
+    public AddressEntity createAddress(CreateAddressRequest request) {
+        return addressRepository.findByName(request.getName()).orElseGet( () -> {
+            Set<AddressPartEntity> addressParts = request.getAddressParts().stream().map(this::getAddressPart).collect(Collectors.toSet());
+            return AddressEntity
+                    .builder()
+                    .name(request.getName())
+                    .addressParts(addressParts)
+                    .build();
+        });
     }
 
-    public AddressEntity findByName(String name, List<AddressPartDto> addressPart) throws AddressNotFoundException {
-        return addressRepository.findByName(name).orElse(addressRepository.save(AddressEntity
-                .builder()
-                        .name(name)
-                        .addressParts(addressPart.stream().map(this::getAddressPart).collect(Collectors.toSet()))
-                .build())
-        );
-    }
     private AddressPartEntity getAddressPart(AddressPartDto addressPartDto) {
-        return addressPartRepository.findByObjectGuid(addressPartDto.getObjectGuid()).orElse(
-                addressPartRepository.save(AddressPartEntity
-                        .builder()
-                        .fullTypeName(addressPartDto.getFullTypeName())
-                        .level(addressPartDto.getLevel())
-                        .typeName(addressPartDto.getTypeName())
-                        .objectGuid(addressPartDto.getObjectGuid())
-                        .name(addressPartDto.getName())
-                        .build()
-                )
-        );
+        Optional<AddressPartEntity> addressPart = addressPartRepository.findByObjectGuid(addressPartDto.getObjectGuid());
+
+        return addressPart.orElseGet(() -> addressPartRepository.save(AddressPartEntity
+                .builder()
+                .fullTypeName(addressPartDto.getFullTypeName())
+                .level(addressPartDto.getLevel())
+                .typeName(addressPartDto.getTypeName())
+                .objectGuid(addressPartDto.getObjectGuid())
+                .name(addressPartDto.getName())
+                .build()
+        ));
     }
+
 }
