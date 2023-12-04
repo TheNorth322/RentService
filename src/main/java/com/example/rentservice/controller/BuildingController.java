@@ -60,4 +60,12 @@ public class BuildingController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    @GetMapping("/all")
+    private ResponseEntity getBuildings() {
+        try {
+            return ResponseEntity.ok(buildingService.getBuildings());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

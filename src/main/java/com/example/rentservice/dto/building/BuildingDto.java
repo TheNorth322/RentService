@@ -19,7 +19,6 @@ public class BuildingDto {
     private AddressDto address;
     private Integer floorCount;
     private String telephone;
-    private List<RoomDto> rooms;
 
     public static BuildingDto toDto(BuildingEntity entity) {
         return BuildingDto
@@ -27,7 +26,6 @@ public class BuildingDto {
                 .address(AddressDto.toDto(entity.getAddress()))
                 .floorCount(entity.getFloorCount())
                 .telephone(entity.getTelephone())
-                .rooms(entity.getRooms().stream().map(RoomDto::toDto).toList())
                 .build();
     }
 }
