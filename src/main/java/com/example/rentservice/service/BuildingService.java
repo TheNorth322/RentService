@@ -3,6 +3,7 @@ package com.example.rentservice.service;
 import com.example.rentservice.dto.CreateAddressRequest;
 import com.example.rentservice.dto.building.BuildingDto;
 import com.example.rentservice.dto.building.CreateBuildingRequest;
+import com.example.rentservice.dto.building.UpdateBuildingRequest;
 import com.example.rentservice.dto.room.RoomDto;
 import com.example.rentservice.entity.AddressEntity;
 import com.example.rentservice.entity.building.BuildingEntity;
@@ -57,5 +58,31 @@ public class BuildingService {
         if (buildings.isEmpty())
             throw new NoBuildingsFoundException("No buildings found");
         return buildings;
+    }
+
+    public String deleteBuilding(Long id) throws BuildingNotFoundException {
+        BuildingEntity building = buildingRepository.findById(id).orElseThrow(() -> new BuildingNotFoundException("Building not found"));
+
+        buildingRepository.delete(building);
+
+        return "Building was successfully deleted";
+    }
+
+    public BuildingDto getBuilding(Long id) throws BuildingNotFoundException {
+        BuildingEntity building = buildingRepository.findById(id).orElseThrow(() -> new BuildingNotFoundException("Building not found"));
+        return BuildingDto.toDto(building);
+    }
+
+    public String updateBuilding(UpdateBuildingRequest request) throws BuildingNotFoundException {
+        BuildingEntity building = buildingRepository.findById(request.getId()).orElseThrow(() -> new BuildingNotFoundException("Building not found"));
+        AddressEntity address = addressService.createAddress(new CreateAddressRequest(request.getAddress(), request.getAddressParts()));
+
+        building.setAddress(address);
+        building.setTelephone(request.getTelephone());
+        building.setFloorCount(request.getFloorCount());
+
+        buildingRepository.save(building);
+
+        return "Building was successfully updated";
     }
 }

@@ -19,12 +19,8 @@ public class BankService {
     @Autowired
     private BankRepository bankRepository;
 
-    public List<BankDto> getAllBanks(String name) throws BanksNotFoundException {
-        List<BankEntity> banks = bankRepository.findAllByNameLike(name);
-
-        if (banks.isEmpty())
-            throw new BanksNotFoundException("Banks not found");
-
+    public List<BankDto> getAllBanks() throws BanksNotFoundException {
+        List<BankEntity> banks = bankRepository.findAll();
         return banks.stream().map(BankDto::toDto).toList();
     }
 

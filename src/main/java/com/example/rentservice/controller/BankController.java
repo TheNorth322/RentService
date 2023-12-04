@@ -17,9 +17,9 @@ public class BankController {
     private BankService bankService;
 
     @GetMapping("/all")
-    public ResponseEntity getAllBanks(@RequestParam String name) {
+    public ResponseEntity getAllBanks() {
         try {
-            return ResponseEntity.ok(bankService.getAllBanks(name));
+            return ResponseEntity.ok(bankService.getAllBanks());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
