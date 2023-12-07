@@ -16,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 public class BuildingDto {
     private Long id;
+    private String name;
     private AddressDto address;
     private Integer floorCount;
     private String telephone;
@@ -23,6 +24,7 @@ public class BuildingDto {
     public static BuildingDto toDto(BuildingEntity entity) {
         return BuildingDto
                 .builder()
+                .name(entity.getName())
                 .address(AddressDto.toDto(entity.getAddress()))
                 .floorCount(entity.getFloorCount())
                 .telephone(entity.getTelephone())

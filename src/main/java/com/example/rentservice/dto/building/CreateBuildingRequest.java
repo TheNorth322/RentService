@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateBuildingRequest {
+    private String name;
     private String address;
     private List<AddressPartDto> addressParts;
     private Integer floorCount;

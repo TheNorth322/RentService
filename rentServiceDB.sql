@@ -129,6 +129,7 @@ CREATE TABLE "agreement_room" (
 -- Данные о зданиях
 CREATE TABLE "buildings" (
   "id" BIGSERIAL PRIMARY KEY,
+  "name" varchar NOT NULL,
   "address_id" BIGINT NOT NULL,
   "floor_count" integer NOT NULL,
   "telephone" varchar(30) NOT NULL

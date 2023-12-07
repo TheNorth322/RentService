@@ -33,6 +33,7 @@ public class BuildingService {
 
         BuildingEntity building = BuildingEntity
                 .builder()
+                .name(request.getName())
                 .address(address)
                 .floorCount(request.getFloorCount())
                 .telephone(request.getTelephone())
@@ -73,16 +74,17 @@ public class BuildingService {
         return BuildingDto.toDto(building);
     }
 
-    public BuildingDto updateBuilding(UpdateBuildingRequest request) throws BuildingNotFoundException {
+    public String updateBuilding(UpdateBuildingRequest request) throws BuildingNotFoundException {
         BuildingEntity building = buildingRepository.findById(request.getId()).orElseThrow(() -> new BuildingNotFoundException("Building not found"));
         AddressEntity address = addressService.createAddress(new CreateAddressRequest(request.getAddress(), request.getAddressParts()));
 
+        building.setName(request.getName());
         building.setAddress(address);
         building.setTelephone(request.getTelephone());
         building.setFloorCount(request.getFloorCount());
 
 
-        return BuildingDto.toDto(buildingRepository.save(building));
+        return "Building was successfully updated";
     }
 
     public List<BuildingDto> getBuildings() {

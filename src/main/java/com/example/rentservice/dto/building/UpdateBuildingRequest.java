@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class UpdateBuildingRequest {
     private Long id;
+    private String name;
     private String address;
     private List<AddressPartDto> addressParts;
     private int floorCount;

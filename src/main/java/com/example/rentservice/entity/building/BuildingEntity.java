@@ -21,6 +21,8 @@ public class BuildingEntity {
     @GeneratedValue
     private Long id;
 
+    private String name;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id", referencedColumnName = "id")
     private AddressEntity address;

@@ -30,11 +30,11 @@ public class AddressService {
     public AddressEntity createAddress(CreateAddressRequest request) {
         return addressRepository.findByName(request.getName()).orElseGet( () -> {
             Set<AddressPartEntity> addressParts = request.getAddressParts().stream().map(this::getAddressPart).collect(Collectors.toSet());
-            return AddressEntity
+            return addressRepository.save(AddressEntity
                     .builder()
                     .name(request.getName())
                     .addressParts(addressParts)
-                    .build();
+                    .build());
         });
     }
 
