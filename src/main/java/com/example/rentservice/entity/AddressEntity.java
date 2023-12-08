@@ -17,6 +17,7 @@ import java.util.Set;
 @Builder
 @Table(name = "addresses")
 @EqualsAndHashCode(exclude = {"migrationService", "entityUser", "passports", "building", "addressParts"})
+@ToString(exclude = {"migrationService", "entityUser", "passports", "building", "addressParts"})
 public class AddressEntity {
     @Id
     @GeneratedValue

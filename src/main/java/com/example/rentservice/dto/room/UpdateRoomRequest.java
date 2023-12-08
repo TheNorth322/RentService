@@ -11,7 +11,8 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateRoomRequest {
+public class UpdateRoomRequest {
+    private Long id;
     private Long buildingId;
     private boolean telephone;
     private Double area;

@@ -4,10 +4,7 @@ import com.example.rentservice.entity.agreement.AgreementRoomEntity;
 import com.example.rentservice.entity.building.BuildingEntity;
 import com.example.rentservice.entity.user.UserEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Set;
 
@@ -17,6 +14,8 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Table(name = "rooms")
+@ToString(exclude = {"types", "roomImages", "rents", "building"})
+@EqualsAndHashCode(exclude = {"types", "roomImages", "rents", "building"})
 public class RoomEntity {
     @Id
     @GeneratedValue

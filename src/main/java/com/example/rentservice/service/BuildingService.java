@@ -83,7 +83,7 @@ public class BuildingService {
         building.setTelephone(request.getTelephone());
         building.setFloorCount(request.getFloorCount());
 
-
+        buildingRepository.save(building);
         return "Building was successfully updated";
     }
 

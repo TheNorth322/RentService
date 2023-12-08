@@ -24,6 +24,7 @@ public class BuildingDto {
     public static BuildingDto toDto(BuildingEntity entity) {
         return BuildingDto
                 .builder()
+                .id(entity.getId())
                 .name(entity.getName())
                 .address(AddressDto.toDto(entity.getAddress()))
                 .floorCount(entity.getFloorCount())

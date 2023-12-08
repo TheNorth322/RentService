@@ -3,10 +3,7 @@ package com.example.rentservice.entity.building;
 import com.example.rentservice.entity.AddressEntity;
 import com.example.rentservice.entity.room.RoomEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Set;
 
@@ -16,6 +13,8 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 @Table(name = "buildings")
+@EqualsAndHashCode(exclude = {"address", "rooms"})
+@ToString(exclude = {"address", "rooms"})
 public class BuildingEntity {
     @Id
     @GeneratedValue

@@ -1,11 +1,7 @@
 package com.example.rentservice.controller;
 
-import com.example.rentservice.dto.room.AddRoomTypesToRoomRequest;
-import com.example.rentservice.dto.room.CreateRoomRequest;
-import com.example.rentservice.dto.room.CreateRoomTypeRequest;
-import com.example.rentservice.dto.room.UpdateRoomTypeRequest;
+import com.example.rentservice.dto.room.*;
 import com.example.rentservice.service.RoomService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +15,40 @@ public class RoomController {
     @Autowired
     private RoomService roomService;
 
+    @GetMapping("/all")
+    public ResponseEntity getRooms() {
+        try {
+            return ResponseEntity.ok(roomService.getRooms());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity createRoom(@RequestBody CreateRoomRequest request) {
         try {
             return ResponseEntity.ok(roomService.createRoom(request));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/update")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity updateRoom(@RequestBody UpdateRoomRequest request) {
+        try {
+            return ResponseEntity.ok(roomService.updateRoom(request));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/delete")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity deleteRoom(@RequestParam long id) {
+        try {
+            return ResponseEntity.ok(roomService.deleteRoom(id));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
