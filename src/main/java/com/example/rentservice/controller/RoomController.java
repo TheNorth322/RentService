@@ -55,7 +55,7 @@ public class RoomController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity getRoomById(@RequestPart Long id) {
+    public ResponseEntity getRoomById(@PathVariable long id) {
         try {
             return ResponseEntity.ok(roomService.getRoomById(id));
         } catch (Exception e) {
