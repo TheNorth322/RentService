@@ -27,6 +27,10 @@ public class AddressService {
     @Autowired
     private AddressPartRepository addressPartRepository;
 
+    public AddressEntity findAddress(AddressDto addressDto) throws AddressNotFoundException {
+        return addressRepository.findByName(addressDto.getName()).orElseThrow(() -> new AddressNotFoundException("Address not found"));
+    }
+
     public AddressEntity createAddress(CreateAddressRequest request) {
         return addressRepository.findByName(request.getName()).orElseGet( () -> {
             Set<AddressPartEntity> addressParts = request.getAddressParts().stream().map(this::getAddressPart).collect(Collectors.toSet());

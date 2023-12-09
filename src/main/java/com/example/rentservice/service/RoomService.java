@@ -43,9 +43,8 @@ public class RoomService {
     public RoomDto createRoom(CreateRoomRequest request) throws BuildingNotFoundException {
         BuildingEntity building = buildingRepository.findById(request.getBuildingId()).orElseThrow(() -> new BuildingNotFoundException("Building not found"));
         Set<TypeEntity> types = request.getTypes().stream().map(this::getType).collect(Collectors.toSet());
-        Set<RoomImageEntity> roomImages = request.getRoomImages().stream().map(this::getRoomImage).collect(Collectors.toSet());
 
-        RoomEntity room = RoomEntity
+        RoomEntity room = roomRepository.save(RoomEntity
                 .builder()
                 .building(building)
                 .telephone(request.isTelephone())
@@ -55,16 +54,18 @@ public class RoomService {
                 .price(request.getPrice())
                 .description(request.getDescription())
                 .types(types)
-                .roomImages(roomImages)
-                .build();
+                .build());
 
+        Set<RoomImageEntity> roomImages = request.getRoomImages().stream().map((roomImage) -> {return getRoomImage(roomImage, room);}).collect(Collectors.toSet());
+        room.setRoomImages(roomImages);
         return RoomDto.toDto(roomRepository.save(room));
     }
 
-    private RoomImageEntity getRoomImage(RoomImageDto roomImageDto) {
-        return roomImageRepository.findById(roomImageDto.getId()).orElseGet(() -> roomImageRepository.save(
+    private RoomImageEntity getRoomImage(RoomImageDto roomImageDto, RoomEntity room) {
+        return roomImageRepository.findByUrl(roomImageDto.getUrl()).orElseGet(() -> roomImageRepository.save(
                 RoomImageEntity
                         .builder()
+                        .room(room)
                         .url(roomImageDto.getUrl())
                         .build()
         ));
@@ -130,9 +131,10 @@ public class RoomService {
     public String updateRoom(UpdateRoomRequest request) throws BuildingNotFoundException, RoomNotFoundException {
         BuildingEntity building = buildingRepository.findById(request.getBuildingId()).orElseThrow(() -> new BuildingNotFoundException("Building not found"));
         Set<TypeEntity> types = request.getTypes().stream().map(this::getType).collect(Collectors.toSet());
-        Set<RoomImageEntity> roomImages = request.getRoomImages().stream().map(this::getRoomImage).collect(Collectors.toSet());
 
         RoomEntity room = roomRepository.findById(request.getId()).orElseThrow(() -> new RoomNotFoundException("Room not found"));
+        Set<RoomImageEntity> roomImages = request.getRoomImages().stream().map((roomImage) -> {return getRoomImage(roomImage, room);}).collect(Collectors.toSet());
+
         room.setBuilding(building);
         room.setTelephone(request.isTelephone());
         room.setArea(request.getArea());

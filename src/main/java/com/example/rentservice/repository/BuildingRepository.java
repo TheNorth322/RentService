@@ -8,6 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BuildingRepository extends JpaRepository<BuildingEntity, Long> {
-    List<BuildingEntity> findAllByAddressLike(String address);
+    List<BuildingEntity> findAllByAddressLike(AddressEntity address);
     Optional<BuildingEntity> findByAddress(AddressEntity address);
 }

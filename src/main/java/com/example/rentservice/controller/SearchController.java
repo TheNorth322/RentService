@@ -1,5 +1,6 @@
 package com.example.rentservice.controller;
 
+import com.example.rentservice.dto.AddressDto;
 import com.example.rentservice.dto.SearchAddressesRequest;
 import com.example.rentservice.service.SearchService;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +15,10 @@ public class SearchController {
     @Autowired
     private SearchService searchService;
 
-    @GetMapping("/buildings")
-    public ResponseEntity searchBuildingsByAddress(@RequestParam String address) {
+    @GetMapping("/building")
+    private ResponseEntity getBuildingByAddress(@RequestBody AddressDto address) {
         try {
-            return ResponseEntity.ok(searchService.searchBuildingsByAddress(address));
+            return ResponseEntity.ok(searchService.getBuildingByAddress(address));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

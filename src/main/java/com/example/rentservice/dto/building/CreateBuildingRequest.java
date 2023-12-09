@@ -19,4 +19,5 @@ public class CreateBuildingRequest {
     private List<AddressPartDto> addressParts;
     private Integer floorCount;
     private String telephone;
+
 }

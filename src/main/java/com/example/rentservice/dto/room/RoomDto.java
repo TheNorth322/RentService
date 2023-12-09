@@ -18,7 +18,6 @@ public class RoomDto {
     private long id;
     private boolean isTelephone;
     private Double area;
-    private AddressDto address;
     private Integer number;
     private Integer floor;
     private List<TypeDto> types;
@@ -32,7 +31,6 @@ public class RoomDto {
                 .builder()
                 .id(entity.getId())
                 .isTelephone(entity.isTelephone())
-                .address(AddressDto.toDto(entity.getBuilding().getAddress()))
                 .number(entity.getNumber())
                 .floor(entity.getFloor())
                 .area(entity.getArea())
@@ -40,6 +38,7 @@ public class RoomDto {
                 .types(entity.getTypes().stream().map(TypeDto::toDto).toList())
                 .description(entity.getDescription())
                 .building(BuildingDto.toDto(entity.getBuilding()))
+                .images(entity.getRoomImages().stream().map(RoomImageDto::toDto).toList())
                 .build();
     }
 }

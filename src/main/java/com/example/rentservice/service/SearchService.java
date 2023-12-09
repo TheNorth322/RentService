@@ -5,14 +5,17 @@ import com.example.rentservice.dto.AddressDto;
 import com.example.rentservice.dto.ApiResponse;
 import com.example.rentservice.dto.MigrationServiceDto;
 import com.example.rentservice.dto.SearchAddressesRequest;
+import com.example.rentservice.dto.building.BuildingDto;
 import com.example.rentservice.dto.building.BuildingSearchDto;
 import com.example.rentservice.dto.room.RoomDto;
 import com.example.rentservice.entity.AddressEntity;
 import com.example.rentservice.entity.AddressPartEntity;
 import com.example.rentservice.entity.room.RoomEntity;
 import com.example.rentservice.entity.room.TypeEntity;
+import com.example.rentservice.exception.AddressNotFoundException;
 import com.example.rentservice.exception.NoMigrationServicesFoundException;
 import com.example.rentservice.exception.TypeNotFoundException;
+import com.example.rentservice.exception.building.BuildingNotFoundException;
 import com.example.rentservice.exception.building.NoBuildingsFoundException;
 import com.example.rentservice.exception.room.NoRoomsFoundException;
 import com.example.rentservice.repository.RoomRepository;
@@ -48,12 +51,6 @@ public class SearchService {
 
     private final String addressesUrl = "https://data.pbprog.ru/api/address/full-address/parse";
     private final String token = "9c7f09abadcc430493fb7b81ea22fd9e76aba61e";
-    public List<BuildingSearchDto> searchBuildingsByAddress(String address) throws NoBuildingsFoundException {
-        return buildingService.findBuildingsByAddress(address)
-                .stream()
-                .map(BuildingSearchDto::toDto)
-                .toList();
-    }
 
     public List<RoomDto> searchRoomsByType(Long typeId) throws NoRoomsFoundException, TypeNotFoundException {
         TypeEntity type = typeRepository.findById(typeId).orElseThrow(() -> new TypeNotFoundException("Type not found"));
@@ -88,5 +85,9 @@ public class SearchService {
 
     public List<MigrationServiceDto> searchMigrationServices() {
         return migrationService.getMigrationServices();
+    }
+
+    public BuildingDto getBuildingByAddress(AddressDto addressDto) throws AddressNotFoundException, BuildingNotFoundException {
+        return buildingService.getBuildingByAddress(addressDto);
     }
 }

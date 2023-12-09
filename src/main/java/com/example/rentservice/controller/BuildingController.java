@@ -1,5 +1,6 @@
 package com.example.rentservice.controller;
 
+import com.example.rentservice.dto.AddressDto;
 import com.example.rentservice.dto.building.CreateBuildingRequest;
 import com.example.rentservice.dto.building.UpdateBuildingRequest;
 import com.example.rentservice.service.BuildingService;

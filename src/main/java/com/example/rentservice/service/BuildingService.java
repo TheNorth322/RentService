@@ -1,5 +1,6 @@
 package com.example.rentservice.service;
 
+import com.example.rentservice.dto.AddressDto;
 import com.example.rentservice.dto.CreateAddressRequest;
 import com.example.rentservice.dto.building.BuildingDto;
 import com.example.rentservice.dto.building.CreateBuildingRequest;
@@ -54,13 +55,6 @@ public class BuildingService {
                 .toList();
     }
 
-    public List<BuildingEntity> findBuildingsByAddress(String address) throws NoBuildingsFoundException {
-        List<BuildingEntity> buildings = buildingRepository.findAllByAddressLike(address);
-        if (buildings.isEmpty())
-            throw new NoBuildingsFoundException("No buildings found");
-        return buildings;
-    }
-
     public String deleteBuilding(Long id) throws BuildingNotFoundException {
         BuildingEntity building = buildingRepository.findById(id).orElseThrow(() -> new BuildingNotFoundException("Building not found"));
 
@@ -89,5 +83,10 @@ public class BuildingService {
 
     public List<BuildingDto> getBuildings() {
         return buildingRepository.findAll().stream().map(BuildingDto::toDto).toList();
+    }
+
+    public BuildingDto getBuildingByAddress(AddressDto addressDto) throws AddressNotFoundException, BuildingNotFoundException {
+        AddressEntity address = addressService.findAddress(addressDto);
+        return BuildingDto.toDto(buildingRepository.findByAddress(address).orElseThrow(() -> new BuildingNotFoundException("Building not found")));
     }
 }
