@@ -2,18 +2,16 @@ package com.example.rentservice.service;
 
 import com.example.rentservice.dto.room.*;
 import com.example.rentservice.entity.building.BuildingEntity;
-import com.example.rentservice.entity.room.RoomEntity;
-import com.example.rentservice.entity.room.RoomImageEntity;
-import com.example.rentservice.entity.room.TypeEntity;
+import com.example.rentservice.entity.room.*;
+import com.example.rentservice.entity.user.UserEntity;
 import com.example.rentservice.exception.TypeExistsException;
 import com.example.rentservice.exception.TypeNotFoundException;
+import com.example.rentservice.exception.UserRoomAlreadyExistsException;
+import com.example.rentservice.exception.auth.UserNotFoundException;
 import com.example.rentservice.exception.building.BuildingNotFoundException;
 import com.example.rentservice.exception.room.RoomNotFoundException;
 import com.example.rentservice.exception.room.RoomTypeNotFoundException;
-import com.example.rentservice.repository.BuildingRepository;
-import com.example.rentservice.repository.RoomImageRepository;
-import com.example.rentservice.repository.RoomRepository;
-import com.example.rentservice.repository.TypeRepository;
+import com.example.rentservice.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +33,12 @@ public class RoomService {
 
     @Autowired
     private RoomRepository roomRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private UserRoomRepository userRoomRepository;
 
     public List<RoomDto> getRooms() {
         return roomRepository.findAll().stream().map(RoomDto::toDto).toList();
@@ -157,4 +161,29 @@ public class RoomService {
     }
 
 
+    public String addRoomToCart(AddRoomToCartRequest request) throws UserNotFoundException, RoomNotFoundException, UserRoomAlreadyExistsException {
+        UserEntity user = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new UserNotFoundException("User not found"));
+        RoomEntity room = roomRepository.findById(request.getRoomId()).orElseThrow(() -> new RoomNotFoundException("Room not found"));
+        UserRoomKey id = UserRoomKey
+                .builder()
+                .userId(user.getId())
+                .roomId(room.getId())
+                .build();
+
+        Optional<UserRoomEntity> userRoomOptional = userRoomRepository.findById(id);
+
+        if (userRoomOptional.isPresent())
+            throw new UserRoomAlreadyExistsException("Room is already in cart");
+
+        UserRoomEntity userRoom = UserRoomEntity
+                .builder()
+                .id(id)
+                .startOfRent(request.getStartOfRent())
+                .endOfRent(request.getEndOfRent())
+                .purposeOfRent(request.getPurposeOfRent())
+                .build();
+
+        userRoomRepository.save(userRoom);
+        return "Room was successfully added to cart";
+    }
 }

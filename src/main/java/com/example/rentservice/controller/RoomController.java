@@ -34,6 +34,15 @@ public class RoomController {
         }
     }
 
+    @PostMapping("/addToCart")
+    public ResponseEntity addRoomToCart(@RequestBody AddRoomToCartRequest request) {
+        try {
+            return ResponseEntity.ok(roomService.addRoomToCart(request));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PutMapping("/update")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity updateRoom(@RequestBody UpdateRoomRequest request) {

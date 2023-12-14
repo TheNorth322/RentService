@@ -159,7 +159,11 @@ CREATE TABLE "passports" (
 
 CREATE TABLE "user_rooms" (
   "user_id" BIGINT NOT NULL,
-  "room_id" BIGINT NOT NULL
+  "room_id" BIGINT NOT NULL,
+  "purpose_of_rent" varchar(100) NOT NULL,
+  "start_of_rent" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  "end_of_rent" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  "rent_amount" integer NOT NULL
 );
 
 -- Токены
