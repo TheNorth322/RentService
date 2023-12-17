@@ -19,6 +19,7 @@ public class UpdateRoomRequest {
     private Integer number;
     private Integer floor;
     private Integer price;
+    private Integer fine;
     private String description;
     private Set<TypeDto> types;
     private Set<RoomImageDto> roomImages;

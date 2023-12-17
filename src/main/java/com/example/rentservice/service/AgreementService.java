@@ -4,17 +4,19 @@ import com.example.rentservice.dto.agreement.CreateAgreementRequest;
 import com.example.rentservice.entity.agreement.AgreementEntity;
 import com.example.rentservice.entity.agreement.AgreementRoomEntity;
 import com.example.rentservice.entity.room.RoomEntity;
+import com.example.rentservice.entity.room.UserRoomEntity;
 import com.example.rentservice.entity.user.UserEntity;
+import com.example.rentservice.enums.PaymentFrequency;
+import com.example.rentservice.exception.UserRoomsNotFoundException;
 import com.example.rentservice.exception.auth.UserNotFoundException;
 import com.example.rentservice.exception.room.RoomNotFoundException;
-import com.example.rentservice.repository.AgreementRepository;
-import com.example.rentservice.repository.RoomRepository;
-import com.example.rentservice.repository.UserRepository;
+import com.example.rentservice.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.Set;
+import java.math.BigDecimal;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,48 +30,105 @@ public class AgreementService {
     @Autowired
     private RoomRepository roomRepository;
 
-    public String createAgreement(CreateAgreementRequest request) throws UserNotFoundException {
-        UserEntity user = userRepository
-                .findByUsername(request.getUsername())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+    @Autowired
+    private UserRoomRepository userRoomRepository;
 
-        Set<AgreementRoomEntity> rooms = request.getAgreementRooms()
-                .stream()
-                .map((room) -> {
-                    try {
-                        RoomEntity roomEntity = roomRepository.findById(room.getRoomId()).orElseThrow(() -> new RoomNotFoundException("Room not found"));
-                        return AgreementRoomEntity
-                                .builder()
-                                .room(roomEntity)
-                                .startOfRent(room.getStartOfRent())
-                                .endOfRent(room.getEndOfRent())
-                                .purposeOfRent(room.getPurposeOfRent())
-                                .rentAmount(123)
-                                .build();
-                    } catch (RoomNotFoundException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .collect(Collectors.toSet());
+    @Autowired
+    private AgreementRoomRepository agreementRoomRepository;
 
-        AgreementEntity agreement = AgreementEntity
+    public String createAgreement(CreateAgreementRequest request) throws UserNotFoundException, UserRoomsNotFoundException, RoomNotFoundException {
+        UserEntity user = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new UserNotFoundException("User not found"));
+        List<UserRoomEntity> userRooms = userRoomRepository.findById_UserId(user.getId());
+
+        if (userRooms.isEmpty())
+            throw new UserRoomsNotFoundException("User rooms not found");
+
+        AgreementEntity agreement = agreementRepository.save(AgreementEntity
                 .builder()
                 .registrationNumber(generateRegistrationNumber())
-                .additionalConditions(request.getAdditionalConditions())
                 .paymentFrequency(request.getPaymentFrequency())
-                .fine(request.getFine())
-                .rents(rooms)
-                .startsFrom(request.getStartsFrom())
-                .lastsTo(request.getLastsTo())
-                .build();
+                .additionalConditions(request.getAdditionalConditions())
+                .fine(getFine(userRooms))
+                .startsFrom(getStartsFrom(user.getId()))
+                .lastsTo(getLastsTo(user.getId()))
+                .build());
 
-        userRepository.save(user.addAgreement(agreement));
+        for (UserRoomEntity userRoom: userRooms) {
+            createAgreementRoom(userRoom, agreement);
+        }
 
         return "Agreement was successfully created";
     }
 
+    private void createAgreementRoom(UserRoomEntity userRoom, AgreementEntity agreement) throws RoomNotFoundException {
+        RoomEntity room = roomRepository.findById(userRoom.getId().getRoomId()).orElseThrow(() -> new RoomNotFoundException("Room not found"));
+
+        int roomPrice = room.getPrice();
+        PaymentFrequency paymentFrequency = agreement.getPaymentFrequency();
+
+        long monthsOfRent = getMonthsDifference(userRoom.getStartOfRent(), userRoom.getEndOfRent());
+
+        int rentAmount;
+        if (paymentFrequency == PaymentFrequency.MONTHLY) {
+            rentAmount = (int) (roomPrice * monthsOfRent);
+        } else if (paymentFrequency == PaymentFrequency.QUARTERLY) {
+            long quartersOfRent = monthsOfRent / 3;
+            rentAmount = (int) (roomPrice * quartersOfRent);
+        } else {
+            rentAmount = 0;
+        }
+
+        agreementRoomRepository.save(AgreementRoomEntity
+                .builder()
+                        .room(room)
+                        .agreement(agreement)
+                        .purposeOfRent(userRoom.getPurposeOfRent())
+                        .startOfRent(userRoom.getStartOfRent())
+                        .endOfRent(userRoom.getEndOfRent())
+                        .rentAmount(rentAmount)
+                .build()
+        );
+
+        userRoomRepository.delete(userRoom);
+    }
+
+    private int getFine(List<UserRoomEntity> userRooms) throws RoomNotFoundException {
+        int fine = 0;
+
+        for (UserRoomEntity userRoom: userRooms) {
+            fine += roomRepository.findById(userRoom.getId().getRoomId())
+                    .orElseThrow(() -> new RoomNotFoundException("Room not found"))
+                    .getFine();
+        }
+
+        return fine;
+    }
     private Long generateRegistrationNumber() {
         Optional<AgreementEntity> agreement = agreementRepository.findTopByOrderByRegistrationNumberDesc();
         return agreement.map(agreementEntity -> agreementEntity.getRegistrationNumber() + 1).orElse(1L);
+    }
+
+    private Date getStartsFrom(Long userId) throws UserRoomsNotFoundException {
+        return userRoomRepository.findFirstByUserIdOrderByStartOfRentAsc(userId).orElseThrow(() -> new UserRoomsNotFoundException("User room not found")).getStartOfRent();
+    }
+
+    private Date getLastsTo(Long userId) throws UserRoomsNotFoundException {
+        return userRoomRepository.findFirstByUserIdOrderByEndOfRentDesc(userId).orElseThrow(() -> new UserRoomsNotFoundException("User room not found")).getEndOfRent();
+    }
+
+    private long getMonthsDifference(Date startDate, Date endDate) {
+        Calendar startCalendar = new GregorianCalendar();
+        startCalendar.setTime(startDate);
+
+        Calendar endCalendar = new GregorianCalendar();
+        endCalendar.setTime(endDate);
+
+        int startYear = startCalendar.get(Calendar.YEAR);
+        int startMonth = startCalendar.get(Calendar.MONTH);
+
+        int endYear = endCalendar.get(Calendar.YEAR);
+        int endMonth = endCalendar.get(Calendar.MONTH);
+
+        return (endYear - startYear) * 12L + (endMonth - startMonth);
     }
 }

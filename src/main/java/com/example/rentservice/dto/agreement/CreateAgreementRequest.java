@@ -17,8 +17,4 @@ public class CreateAgreementRequest {
     private String username;
     private PaymentFrequency paymentFrequency;
     private String additionalConditions;
-    private Integer fine;
-    private Date startsFrom;
-    private Date lastsTo;
-    private List<CreateAgreementRoomDto> agreementRooms;
 }

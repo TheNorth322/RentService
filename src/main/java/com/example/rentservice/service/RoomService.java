@@ -56,6 +56,7 @@ public class RoomService {
                 .number(request.getNumber())
                 .floor(request.getFloor())
                 .price(request.getPrice())
+                .fine(request.getFine())
                 .description(request.getDescription())
                 .types(types)
                 .build());
@@ -145,6 +146,7 @@ public class RoomService {
         room.setNumber(request.getNumber());
         room.setFloor(request.getFloor());
         room.setPrice(request.getPrice());
+        room.setFine(request.getFine());
         room.setDescription(request.getDescription());
         room.setTypes(types);
         room.setRoomImages(roomImages);

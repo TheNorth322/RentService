@@ -24,6 +24,7 @@ public class RoomDto {
     private String description;
     private Integer price;
     private BuildingDto building;
+    private Integer fine;
     private List<RoomImageDto> images;
 
     public static RoomDto toDto(RoomEntity entity) {
@@ -39,6 +40,7 @@ public class RoomDto {
                 .description(entity.getDescription())
                 .building(BuildingDto.toDto(entity.getBuilding()))
                 .images(entity.getRoomImages().stream().map(RoomImageDto::toDto).toList())
+                .fine(entity.getFine())
                 .build();
     }
 }

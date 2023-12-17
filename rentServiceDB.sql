@@ -113,6 +113,7 @@ CREATE TABLE "rooms" (
   "number" integer NOT NULL,
   "floor" integer NOT NULL,
   "price" integer NOT NULL,
+  "fine" integer NOT NULL,
   "description" varchar(300)
 );
 
