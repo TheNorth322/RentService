@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -22,6 +23,7 @@ public class IndividualUserDto {
         return IndividualUserDto
                 .builder()
                 .activePassport(PassportDto.toDto(entity.getActivePassport()))
+                .passports(entity.getPassports().stream().map(PassportDto::toDto).collect(Collectors.toList()))
                 .build();
     }
 }

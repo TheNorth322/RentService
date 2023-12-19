@@ -25,6 +25,15 @@ public class MigrationServiceController {
         }
     }
 
+    @GetMapping("/passports")
+    private ResponseEntity getMigrationServicePassports(@RequestParam Long id) {
+        try {
+            return ResponseEntity.ok(migrationService.getMigrationServicePassports(id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity createMigrationService(@RequestBody CreateMigrationServiceRequest request) {

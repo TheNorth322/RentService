@@ -1,9 +1,11 @@
 package com.example.rentservice.service;
 
 import com.example.rentservice.dto.AddressPartDto;
+import com.example.rentservice.dto.CreateAddressRequest;
 import com.example.rentservice.dto.IndividualUserDto;
 import com.example.rentservice.dto.passport.AddPassportRequest;
 import com.example.rentservice.dto.passport.PassportDto;
+import com.example.rentservice.dto.passport.UpdatePassportRequest;
 import com.example.rentservice.entity.AddressEntity;
 import com.example.rentservice.entity.AddressPartEntity;
 import com.example.rentservice.entity.user.IndividualUserEntity;
@@ -28,6 +30,9 @@ import java.util.stream.Collectors;
 public class PassportService {
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private AddressService addressService;
 
     @Autowired
     private AddressPartRepository addressPartRepository;
@@ -74,16 +79,17 @@ public class PassportService {
     public IndividualUserEntity addPassport(AddPassportRequest request) throws UserNotFoundException, MigrationServiceNotFoundException {
         validateRequest(request);
         IndividualUserEntity user = individualUserRepository.findByUser_Username(request.getUsername()).orElseThrow(() -> new UserNotFoundException("User not found"));
+        Optional<AddressEntity> addressOptional = addressRepository.findByName(request.getPlaceOfBirth().getName());
 
-        AddressEntity address = addressRepository.findByName(request.getPlaceOfBirth().getName()).orElse(addressRepository.save(AddressEntity
+        AddressEntity address = addressOptional.orElseGet(() -> addressRepository.save(AddressEntity
                 .builder()
                 .name(request.getPlaceOfBirth().getName())
                 .addressParts(request.getPlaceOfBirth().getAddressParts().stream().map(this::getAddressPart).collect(Collectors.toSet()))
-                .build()));
+                .build()));;
+
 
         MigrationServiceEntity migrationService = migrationServiceRepository.findById(request.getMigrationServiceId())
                 .orElseThrow(() -> new MigrationServiceNotFoundException("Migration service not found"));
-
 
         PassportEntity passport = PassportEntity
                 .builder()
@@ -101,11 +107,18 @@ public class PassportService {
                 .build();
 
         passportRepository.save(passport);
-        return individualUserRepository.save(user.addPassport(passport));
+        user.addPassport(passport);
+
+        if (user.getActivePassport() == null)
+            user.setActivePassport(passport);
+        else if (passport.getDateOfIssue().after(user.getActivePassport().getDateOfIssue()))
+            user.setActivePassport(passport);
+
+        return individualUserRepository.save(user);
     }
 
     private AddressPartEntity getAddressPart(AddressPartDto addressPartDto) {
-        return addressPartRepository.findByObjectGuid(addressPartDto.getObjectGuid()).orElse(
+        return addressPartRepository.findByObjectGuid(addressPartDto.getObjectGuid()).orElseGet(() ->
                 addressPartRepository.save(AddressPartEntity
                         .builder()
                                 .fullTypeName(addressPartDto.getFullTypeName())
@@ -142,5 +155,26 @@ public class PassportService {
                 .passports(passports)
                 .activePassport(PassportDto.toDto(user.getActivePassport()))
                 .build();
+    }
+
+    public PassportDto getPassportById(Long id) throws PassportNotFoundException {
+        return PassportDto.toDto(passportRepository.findById(id).orElseThrow(() -> new PassportNotFoundException("Passport not found")));
+    }
+
+    public PassportDto updatePassport(UpdatePassportRequest request) throws PassportNotFoundException, MigrationServiceNotFoundException {
+        PassportEntity passport = passportRepository.findById(request.getId()).orElseThrow(() -> new PassportNotFoundException("Passport not found"));
+        AddressEntity address = addressService.createAddress(request.getPlaceOfBirth());
+
+        passport.setFirstName(request.getFirstName());
+        passport.setLastName(request.getLastName());
+        passport.setSurname(request.getSurname());
+        passport.setDateOfBirth(request.getDateOfBirth());
+        passport.setDateOfIssue(request.getDateOfIssue());
+        passport.setMigrationService(migrationServiceRepository.findById(request.getMigrationServiceId()).orElseThrow(() -> new MigrationServiceNotFoundException("Migration service not found")));
+        passport.setNumber(request.getNumber());
+        passport.setSeries(request.getSeries());
+        passport.setPlaceOfBirth(address);
+
+        return PassportDto.toDto(passportRepository.save(passport));
     }
 }

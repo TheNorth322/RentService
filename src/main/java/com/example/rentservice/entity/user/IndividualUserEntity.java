@@ -2,10 +2,7 @@ package com.example.rentservice.entity.user;
 
 import com.example.rentservice.entity.AddressEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.engine.internal.Cascade;
 
 import java.util.Set;
@@ -15,6 +12,8 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode(exclude = {"user", "passports", "activePassport"})
+@ToString(exclude = {"user", "passports", "activePassport"})
 @Table(name = "individual_user")
 public class IndividualUserEntity {
     @Id

@@ -16,6 +16,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PassportDto {
+    private long id;
     private String firstName;
     private String lastName;
     private String surname;
@@ -25,11 +26,12 @@ public class PassportDto {
     private String number;
     private String series;
     private Gender gender;
-    private String placeOfBirth;
+    private AddressDto placeOfBirth;
 
     public static PassportDto toDto(PassportEntity entity) {
         return PassportDto
                 .builder()
+                .id(entity.getId())
                 .firstName(entity.getFirstName())
                 .lastName(entity.getLastName())
                 .surname(entity.getSurname())
@@ -39,7 +41,7 @@ public class PassportDto {
                 .number(entity.getNumber())
                 .series(entity.getSeries())
                 .gender(entity.getGender())
-                .placeOfBirth(entity.getPlaceOfBirth().getName())
+                .placeOfBirth(AddressDto.toDto(entity.getPlaceOfBirth()))
                 .build();
     }
 }

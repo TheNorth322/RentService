@@ -43,15 +43,18 @@ public class AgreementService {
         if (userRooms.isEmpty())
             throw new UserRoomsNotFoundException("User rooms not found");
 
-        AgreementEntity agreement = agreementRepository.save(AgreementEntity
+        AgreementEntity agreement = AgreementEntity
                 .builder()
+                .user(user)
                 .registrationNumber(generateRegistrationNumber())
                 .paymentFrequency(request.getPaymentFrequency())
                 .additionalConditions(request.getAdditionalConditions())
                 .fine(getFine(userRooms))
                 .startsFrom(getStartsFrom(user.getId()))
                 .lastsTo(getLastsTo(user.getId()))
-                .build());
+                .build();
+
+        agreement = agreementRepository.save(agreement);
 
         for (UserRoomEntity userRoom: userRooms) {
             createAgreementRoom(userRoom, agreement);
@@ -78,7 +81,7 @@ public class AgreementService {
             rentAmount = 0;
         }
 
-        agreementRoomRepository.save(AgreementRoomEntity
+        AgreementRoomEntity agreementRoom = agreementRoomRepository.save(AgreementRoomEntity
                 .builder()
                         .room(room)
                         .agreement(agreement)
@@ -88,7 +91,8 @@ public class AgreementService {
                         .rentAmount(rentAmount)
                 .build()
         );
-
+        agreement.addAgreementRoom(agreementRoom);
+        agreementRepository.save(agreement);
         userRoomRepository.delete(userRoom);
     }
 

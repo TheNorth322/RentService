@@ -5,6 +5,7 @@ import com.example.rentservice.dto.CreateAddressRequest;
 import com.example.rentservice.dto.CreateMigrationServiceRequest;
 import com.example.rentservice.dto.MigrationServiceDto;
 import com.example.rentservice.dto.migrationService.UpdateMigrationServiceRequest;
+import com.example.rentservice.dto.passport.PassportDto;
 import com.example.rentservice.entity.AddressEntity;
 import com.example.rentservice.entity.user.MigrationServiceEntity;
 import com.example.rentservice.exception.*;
@@ -74,5 +75,10 @@ public class MigrationService {
         MigrationServiceEntity migrationService = migrationServiceRepository.findById(id).orElseThrow(() -> new MigrationServiceNotFoundException("Migration service not found"));
         migrationServiceRepository.delete(migrationService);
         return "Migration service deleted successfully";
+    }
+
+    public List<PassportDto> getMigrationServicePassports(Long id) throws MigrationServiceNotFoundException {
+        MigrationServiceEntity migrationService = migrationServiceRepository.findById(id).orElseThrow(() -> new MigrationServiceNotFoundException("Migration service not found"));
+        return migrationService.getPassports().stream().map(PassportDto::toDto).toList();
     }
 }

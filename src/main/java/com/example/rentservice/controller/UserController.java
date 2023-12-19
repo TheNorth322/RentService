@@ -59,4 +59,22 @@ public class UserController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("/{username}/rooms")
+    public ResponseEntity getUserRooms(@PathVariable String username) {
+        try {
+            return ResponseEntity.ok(userService.getUserRooms(username));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{username}/rooms/delete")
+    public ResponseEntity deleteUserRoom(@PathVariable String username, @RequestParam Long roomId) {
+        try {
+            return ResponseEntity.ok(userService.deleteUserRoom(username, roomId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

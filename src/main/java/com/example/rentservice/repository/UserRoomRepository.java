@@ -13,6 +13,8 @@ public interface UserRoomRepository extends JpaRepository<UserRoomEntity, Long> 
     Optional<UserRoomEntity> findById(UserRoomKey id);
 
     List<UserRoomEntity> findById_UserId(Long id);
+
+    Optional<UserRoomEntity> findById_UserIdAndId_RoomId(Long userId, Long roomId);
     @Query("SELECT u FROM UserRoomEntity u WHERE u.id.userId = :userId ORDER BY u.startOfRent ASC")
     Optional<UserRoomEntity> findFirstByUserIdOrderByStartOfRentAsc(@Param("userId") Long userId);
 

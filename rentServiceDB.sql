@@ -145,7 +145,7 @@ CREATE TABLE "room_images" (
 
 CREATE TABLE "passports" (
   "id" BIGSERIAL PRIMARY KEY,
-  "user_id" BIGINT NOT NULL,
+  "individual_user_id" BIGINT NOT NULL,
   "first_name" varchar NOT NULL,
   "last_name" varchar NOT NULL,
   "surname" varchar,
@@ -163,8 +163,7 @@ CREATE TABLE "user_rooms" (
   "room_id" BIGINT NOT NULL,
   "purpose_of_rent" varchar(100) NOT NULL,
   "start_of_rent" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-  "end_of_rent" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-  "rent_amount" integer NOT NULL
+  "end_of_rent" TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
 -- Токены
@@ -224,7 +223,7 @@ ALTER TABLE "passports" ADD FOREIGN KEY ("migration_service_id") REFERENCES "mig
 
 ALTER TABLE "individual_user" ADD FOREIGN KEY ("active_passport_id") REFERENCES "passports" ("id");
 
-ALTER TABLE "individual_user" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+ALTER TABLE "individual_user" ADD FOREIGN KEY ("individual_user_id") REFERENCES "individual_user" ("id");
 
 ALTER TABLE "entity_user" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 

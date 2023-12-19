@@ -6,10 +6,7 @@ import com.example.rentservice.entity.auth.PasswordResetTokenEntity;
 import com.example.rentservice.entity.room.RoomEntity;
 import com.example.rentservice.enums.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +20,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(exclude = {"cart_rooms", "agreements", "individualUser", "entityUser", "passwordResetToken", "emailVerificationToken"})
+@ToString(exclude = {"cart_rooms", "agreements", "individualUser", "entityUser", "passwordResetToken", "emailVerificationToken"})
 @Table(name = "users")
 public class UserEntity implements UserDetails {
     @Id
