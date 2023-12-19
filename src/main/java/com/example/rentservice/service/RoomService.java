@@ -1,9 +1,11 @@
 package com.example.rentservice.service;
 
 import com.example.rentservice.dto.room.*;
+import com.example.rentservice.entity.agreement.AgreementRoomEntity;
 import com.example.rentservice.entity.building.BuildingEntity;
 import com.example.rentservice.entity.room.*;
 import com.example.rentservice.entity.user.UserEntity;
+import com.example.rentservice.exception.AgreementRoomsNotFoundExcetption;
 import com.example.rentservice.exception.TypeExistsException;
 import com.example.rentservice.exception.TypeNotFoundException;
 import com.example.rentservice.exception.UserRoomAlreadyExistsException;
@@ -38,10 +40,13 @@ public class RoomService {
     private UserRepository userRepository;
 
     @Autowired
+    private AgreementRoomRepository agreementRoomRepository;
+
+    @Autowired
     private UserRoomRepository userRoomRepository;
 
     public List<RoomDto> getRooms() {
-        return roomRepository.findAll().stream().map(RoomDto::toDto).toList();
+        return roomRepository.findAvailableRooms().stream().map(RoomDto::toDto).toList();
     }
 
     public RoomDto createRoom(CreateRoomRequest request) throws BuildingNotFoundException {
@@ -187,5 +192,12 @@ public class RoomService {
 
         userRoomRepository.save(userRoom);
         return "Room was successfully added to cart";
+    }
+
+    public List<AgreementRoomDto> getAgreementRoomsByAgreementId(Long id) throws AgreementRoomsNotFoundExcetption {
+        List<AgreementRoomEntity> agreementRooms = agreementRoomRepository.findAllByAgreement_Id(id);
+        if (agreementRooms.isEmpty())
+            throw new AgreementRoomsNotFoundExcetption("Agreement rooms not found");
+        return agreementRooms.stream().map(AgreementRoomDto::toDto).toList();
     }
 }

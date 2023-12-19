@@ -24,6 +24,14 @@ public class RoomController {
         }
     }
 
+    @GetMapping("/agreement")
+    public ResponseEntity getAgreementRoomsByAgreementId(@RequestParam Long id) {
+        try {
+            return ResponseEntity.ok(roomService.getAgreementRoomsByAgreementId(id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity createRoom(@RequestBody CreateRoomRequest request) {

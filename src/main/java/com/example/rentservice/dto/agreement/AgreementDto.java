@@ -24,17 +24,17 @@ public class AgreementDto {
     private Integer fine;
     private Date startsFrom;
     private Date lastsTo;
-    private List<AgreementRoomDto> rooms;
 
     public static AgreementDto toDto(AgreementEntity entity) {
         return AgreementDto
                 .builder()
+                .id(entity.getId())
+                .additionalConditions(entity.getAdditionalConditions())
                 .fine(entity.getFine())
                 .registrationNumber(entity.getRegistrationNumber())
                 .paymentFrequency(entity.getPaymentFrequency())
                 .startsFrom(entity.getStartsFrom())
                 .lastsTo(entity.getLastsTo())
-                .rooms(entity.getRents().stream().map(AgreementRoomDto::toDto).toList())
                 .build();
     }
 }

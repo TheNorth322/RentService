@@ -7,6 +7,7 @@ import com.example.rentservice.entity.room.RoomEntity;
 import com.example.rentservice.entity.room.UserRoomEntity;
 import com.example.rentservice.entity.user.UserEntity;
 import com.example.rentservice.enums.PaymentFrequency;
+import com.example.rentservice.exception.AgreementNotFoundException;
 import com.example.rentservice.exception.UserRoomsNotFoundException;
 import com.example.rentservice.exception.auth.UserNotFoundException;
 import com.example.rentservice.exception.room.RoomNotFoundException;
@@ -14,6 +15,7 @@ import com.example.rentservice.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -34,6 +36,9 @@ public class AgreementService {
     private UserRoomRepository userRoomRepository;
 
     @Autowired
+    private PDFService pdfService;
+
+    @Autowired
     private AgreementRoomRepository agreementRoomRepository;
 
     public String createAgreement(CreateAgreementRequest request) throws UserNotFoundException, UserRoomsNotFoundException, RoomNotFoundException {
@@ -43,7 +48,7 @@ public class AgreementService {
         if (userRooms.isEmpty())
             throw new UserRoomsNotFoundException("User rooms not found");
 
-        AgreementEntity agreement = AgreementEntity
+        AgreementEntity agreement = agreementRepository.save(AgreementEntity
                 .builder()
                 .user(user)
                 .registrationNumber(generateRegistrationNumber())
@@ -52,18 +57,17 @@ public class AgreementService {
                 .fine(getFine(userRooms))
                 .startsFrom(getStartsFrom(user.getId()))
                 .lastsTo(getLastsTo(user.getId()))
-                .build();
-
-        agreement = agreementRepository.save(agreement);
+                .build());
 
         for (UserRoomEntity userRoom: userRooms) {
             createAgreementRoom(userRoom, agreement);
+            userRoomRepository.delete(userRoom);
         }
 
         return "Agreement was successfully created";
     }
 
-    private void createAgreementRoom(UserRoomEntity userRoom, AgreementEntity agreement) throws RoomNotFoundException {
+    private AgreementRoomEntity createAgreementRoom(UserRoomEntity userRoom, AgreementEntity agreement) throws RoomNotFoundException {
         RoomEntity room = roomRepository.findById(userRoom.getId().getRoomId()).orElseThrow(() -> new RoomNotFoundException("Room not found"));
 
         int roomPrice = room.getPrice();
@@ -81,7 +85,7 @@ public class AgreementService {
             rentAmount = 0;
         }
 
-        AgreementRoomEntity agreementRoom = agreementRoomRepository.save(AgreementRoomEntity
+        return agreementRoomRepository.save(AgreementRoomEntity
                 .builder()
                         .room(room)
                         .agreement(agreement)
@@ -89,11 +93,9 @@ public class AgreementService {
                         .startOfRent(userRoom.getStartOfRent())
                         .endOfRent(userRoom.getEndOfRent())
                         .rentAmount(rentAmount)
-                .build()
-        );
-        agreement.addAgreementRoom(agreementRoom);
-        agreementRepository.save(agreement);
-        userRoomRepository.delete(userRoom);
+                .build());
+
+
     }
 
     private int getFine(List<UserRoomEntity> userRooms) throws RoomNotFoundException {
@@ -134,5 +136,10 @@ public class AgreementService {
         int endMonth = endCalendar.get(Calendar.MONTH);
 
         return (endYear - startYear) * 12L + (endMonth - startMonth);
+    }
+
+    public byte[] generateAgreementPdf(Long id) throws AgreementNotFoundException, IOException {
+        AgreementEntity agreement = agreementRepository.findById(id).orElseThrow(() -> new AgreementNotFoundException("Agreement not found"));
+        return pdfService.generateAgreementPdf(agreement);
     }
 }

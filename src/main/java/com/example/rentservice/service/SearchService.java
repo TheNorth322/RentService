@@ -1,25 +1,24 @@
 package com.example.rentservice.service;
 
 import aj.org.objectweb.asm.TypeReference;
-import com.example.rentservice.dto.AddressDto;
-import com.example.rentservice.dto.ApiResponse;
-import com.example.rentservice.dto.MigrationServiceDto;
-import com.example.rentservice.dto.SearchAddressesRequest;
+import com.example.rentservice.dto.*;
 import com.example.rentservice.dto.building.BuildingDto;
 import com.example.rentservice.dto.building.BuildingSearchDto;
 import com.example.rentservice.dto.room.RoomDto;
 import com.example.rentservice.entity.AddressEntity;
 import com.example.rentservice.entity.AddressPartEntity;
+import com.example.rentservice.entity.building.BuildingEntity;
 import com.example.rentservice.entity.room.RoomEntity;
 import com.example.rentservice.entity.room.TypeEntity;
+import com.example.rentservice.entity.user.MigrationServiceEntity;
 import com.example.rentservice.exception.AddressNotFoundException;
+import com.example.rentservice.exception.MigrationServiceNotFoundException;
 import com.example.rentservice.exception.NoMigrationServicesFoundException;
 import com.example.rentservice.exception.TypeNotFoundException;
 import com.example.rentservice.exception.building.BuildingNotFoundException;
 import com.example.rentservice.exception.building.NoBuildingsFoundException;
 import com.example.rentservice.exception.room.NoRoomsFoundException;
-import com.example.rentservice.repository.RoomRepository;
-import com.example.rentservice.repository.TypeRepository;
+import com.example.rentservice.repository.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +48,14 @@ public class SearchService {
     @Autowired
     private TypeRepository typeRepository;
 
+    @Autowired
+    private IndividualUserRepository individualUserRepository;
+
+    @Autowired
+    private MigrationServiceRepository migrationServiceRepository;
+
+    @Autowired
+    private BuildingRepository buildingRepository;
     private final String addressesUrl = "https://data.pbprog.ru/api/address/full-address/parse";
     private final String token = "9c7f09abadcc430493fb7b81ea22fd9e76aba61e";
 
@@ -89,5 +96,19 @@ public class SearchService {
 
     public BuildingDto getBuildingByAddress(AddressDto addressDto) throws AddressNotFoundException, BuildingNotFoundException {
         return buildingService.getBuildingByAddress(addressDto);
+    }
+
+    public List<RoomDto> findAvailableRoomsInBuilding(Long id) throws BuildingNotFoundException {
+        BuildingEntity building = buildingRepository.findById(id).orElseThrow(() -> new BuildingNotFoundException("Building not found"));
+        return roomRepository.findAvailableRoomsInBuilding(building).stream().map(RoomDto::toDto).toList();
+    }
+
+    public List<RoomDto> findRoomsInBuildingsWithRentals() {
+        return roomRepository.findRoomsInBuildingsWithRentals().stream().map(RoomDto::toDto).toList();
+    }
+
+    public List<IndividualUserDto> findAllByPassportMigrationService(Long id) throws MigrationServiceNotFoundException {
+        MigrationServiceEntity migrationService = migrationServiceRepository.findById(id).orElseThrow(() -> new MigrationServiceNotFoundException("Migration service not found"));
+        return individualUserRepository.findAllByPassportMigrationService(migrationService).stream().map(IndividualUserDto::toDto).toList();
     }
 }

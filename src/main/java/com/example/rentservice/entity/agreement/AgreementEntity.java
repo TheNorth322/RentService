@@ -48,7 +48,6 @@ public class AgreementEntity {
     private Set<AgreementRoomEntity> rents;
 
     public AgreementEntity addAgreementRoom(AgreementRoomEntity agreementRoom) {
-        agreementRoom.setAgreement(this);
         rents.add(agreementRoom);
         return this;
     }
