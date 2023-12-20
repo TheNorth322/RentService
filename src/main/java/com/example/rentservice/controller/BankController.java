@@ -25,6 +25,15 @@ public class BankController {
         }
     }
 
+    @GetMapping("/entities")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity getAllEntityUserInBank(Long id) {
+        try {
+            return ResponseEntity.ok(bankService.getAllEntityUsersInBank(id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity createBank(@RequestBody CreateBankRequest request) {
@@ -54,4 +63,5 @@ public class BankController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
 }

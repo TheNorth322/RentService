@@ -24,6 +24,32 @@ public class RoomController {
         }
     }
 
+    @GetMapping("/available")
+    public ResponseEntity getAvailableRooms() {
+        try {
+            return ResponseEntity.ok(roomService.getAvailableRooms());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/available/in/building")
+    public ResponseEntity getAvailableRoomsInBuilding(long id) {
+        try {
+            return ResponseEntity.ok(roomService.getAvailableRoomsInBuilding(id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/rentals/in/building")
+    public ResponseEntity getRoomInBuildingsWithRentals() {
+        try {
+            return ResponseEntity.ok(roomService.getRoomInBuildingsWithRentals());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
     @GetMapping("/agreement")
     public ResponseEntity getAgreementRoomsByAgreementId(@RequestParam Long id) {
         try {
@@ -32,6 +58,16 @@ public class RoomController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("/agreementRooms")
+    public ResponseEntity getAgreementRoomsByRoomId(@RequestParam Long id) {
+        try {
+            return ResponseEntity.ok(roomService.getAgreementRoomsByRoomId(id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity createRoom(@RequestBody CreateRoomRequest request) {
@@ -43,6 +79,7 @@ public class RoomController {
     }
 
     @PostMapping("/addToCart")
+    @PreAuthorize("hasAuthority('INDIVIDUAL') or hasAuthority('ENTITY')")
     public ResponseEntity addRoomToCart(@RequestBody AddRoomToCartRequest request) {
         try {
             return ResponseEntity.ok(roomService.addRoomToCart(request));

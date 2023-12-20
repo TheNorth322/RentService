@@ -25,7 +25,7 @@ public class MigrationServiceEntity {
     @JoinColumn(name = "address_id", referencedColumnName = "id")
     private AddressEntity address;
 
-    @OneToMany(mappedBy = "migrationService")
+    @OneToMany(mappedBy = "migrationService", cascade = CascadeType.ALL)
     private Set<PassportEntity> passports;
 
     public MigrationServiceEntity addPassport(PassportEntity passport) {

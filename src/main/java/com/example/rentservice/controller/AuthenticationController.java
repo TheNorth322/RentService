@@ -12,8 +12,8 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
 @RequiredArgsConstructor
+@RequestMapping("/auth")
 public class AuthenticationController {
     private final AuthenticationService authService;
     private final JwtService jwtService;
@@ -56,9 +56,9 @@ public class AuthenticationController {
     }
 
     @PostMapping("/forgot/password")
-    public ResponseEntity forgotPassword(@RequestParam String email) {
+    public ResponseEntity forgotPassword(@RequestParam String email, @RequestParam String password) {
         try {
-            return ResponseEntity.ok(authService.forgotPassword(email));
+            return ResponseEntity.ok(authService.forgotPassword(email, password));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

@@ -35,7 +35,7 @@ public class EntityUserEntity {
     @JoinColumn(name = "address_id", referencedColumnName = "id")
     private AddressEntity address;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "bank_id", referencedColumnName = "id")
     private BankEntity bank;
 

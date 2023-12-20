@@ -62,21 +62,19 @@ public class PassportService {
                 .toList();
     }
 
-    public IndividualUserEntity deletePassport(String username, Long passportId) throws PassportNotFoundException {
+    public String deletePassport(String username, Long passportId) throws PassportNotFoundException {
         PassportEntity passport = passportRepository
                 .findById(passportId)
                 .orElseThrow(() -> new PassportNotFoundException("Passport not found"));
 
         IndividualUserEntity user = passport.getUser();
 
-        user.deletePassport(passport);
-        individualUserRepository.save(user);
         passportRepository.delete(passport);
 
-        return user;
+        return "Deletion successfull";
     }
 
-    public IndividualUserEntity addPassport(AddPassportRequest request) throws UserNotFoundException, MigrationServiceNotFoundException {
+    public PassportDto addPassport(AddPassportRequest request) throws UserNotFoundException, MigrationServiceNotFoundException {
         validateRequest(request);
         IndividualUserEntity user = individualUserRepository.findByUser_Username(request.getUsername()).orElseThrow(() -> new UserNotFoundException("User not found"));
         Optional<AddressEntity> addressOptional = addressRepository.findByName(request.getPlaceOfBirth().getName());
@@ -106,7 +104,7 @@ public class PassportService {
                 .migrationService(migrationService)
                 .build();
 
-        passportRepository.save(passport);
+        passport = passportRepository.save(passport);
         user.addPassport(passport);
 
         if (user.getActivePassport() == null)
@@ -114,7 +112,7 @@ public class PassportService {
         else if (passport.getDateOfIssue().after(user.getActivePassport().getDateOfIssue()))
             user.setActivePassport(passport);
 
-        return individualUserRepository.save(user);
+        return PassportDto.toDto(passport);
     }
 
     private AddressPartEntity getAddressPart(AddressPartDto addressPartDto) {

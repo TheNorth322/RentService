@@ -1,5 +1,6 @@
 package com.example.rentservice.service;
 
+import com.example.rentservice.dto.EntityUserDto;
 import com.example.rentservice.dto.bank.BankDto;
 import com.example.rentservice.dto.bank.CreateBankRequest;
 import com.example.rentservice.dto.bank.UpdateBankRequest;
@@ -8,6 +9,7 @@ import com.example.rentservice.exception.BankAlreadyExistsException;
 import com.example.rentservice.exception.BankNotFoundException;
 import com.example.rentservice.exception.BanksNotFoundException;
 import com.example.rentservice.repository.BankRepository;
+import com.example.rentservice.repository.EntityUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,9 @@ import java.util.Optional;
 public class BankService {
     @Autowired
     private BankRepository bankRepository;
+
+    @Autowired
+    private EntityUserRepository entityUserRepository;
 
     public List<BankDto> getAllBanks() throws BanksNotFoundException {
         List<BankEntity> banks = bankRepository.findAll();
@@ -48,5 +53,9 @@ public class BankService {
         BankEntity bank = bankRepository.findById(id).orElseThrow(() -> new BankNotFoundException("Bank not found"));
         bankRepository.delete(bank);
         return "Bank was successfully deleted";
+    }
+
+    public List<EntityUserDto> getAllEntityUsersInBank(Long id) {
+        return entityUserRepository.findAllByBank_Id(id).stream().map(EntityUserDto::toDto).toList();
     }
 }

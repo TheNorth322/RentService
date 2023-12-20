@@ -1,7 +1,11 @@
 package com.example.rentservice.service;
 
+import com.example.rentservice.dto.AddressPartDto;
+import com.example.rentservice.dto.CreateAddressRequest;
 import com.example.rentservice.dto.auth.*;
 import com.example.rentservice.dto.email.EmailDetails;
+import com.example.rentservice.entity.AddressEntity;
+import com.example.rentservice.entity.AddressPartEntity;
 import com.example.rentservice.entity.auth.EmailVerificationTokenEntity;
 import com.example.rentservice.entity.auth.PasswordResetTokenEntity;
 import com.example.rentservice.entity.auth.RefreshToken;
@@ -20,7 +24,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +49,9 @@ public class AuthenticationService {
     private PassportService passportService;
 
     @Autowired
+    private AddressService addressService;
+
+    @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
@@ -62,6 +71,12 @@ public class AuthenticationService {
 
     @Autowired
     private IndividualUserRepository individualUserRepository;
+
+    @Autowired
+    private AddressRepository addressRepository;
+
+    @Autowired
+    private AddressPartRepository addressPartRepository;
 
     public AuthenticationResponse registerUser(RegisterRequest request) throws UserNotFoundException, EmailIsOccupiedException, UsernameIsOccupiedException {
         validateReqisterRequest(request);
@@ -93,11 +108,19 @@ public class AuthenticationService {
     public AuthenticationResponse registerEntity(RegisterEntityRequest request) throws UserNotFoundException, EmailIsOccupiedException, UsernameIsOccupiedException, BankNotFoundException {
         AuthenticationResponse response = this.registerUser(request.getRegisterRequest());
         UserEntity user = userRepository.findByUsername(request.getRegisterRequest().getUsername()).orElseThrow(() -> new UserNotFoundException("User not found"));
+        Optional<AddressEntity> addressOptional = addressRepository.findByName(request.getName());
+
+        AddressEntity address = addressOptional.orElseGet(() -> addressRepository.save(AddressEntity
+                .builder()
+                .name(request.getAddress())
+                .addressParts(request.getAddressParts().stream().map(this::getAddressPart).collect(Collectors.toSet()))
+                .build()));
 
         EntityUserEntity entity = EntityUserEntity
                 .builder()
                 .bank(bankRepository.findById(request.getBankId()).orElseThrow(() -> new BankNotFoundException("Bank not found")))
                 .name(request.getName())
+                .address(address)
                 .supervisorFirstName(request.getSupervisorFirstName())
                 .supervisorLastName(request.getSupervisorLastName())
                 .supervisorSurname(request.getSupervisorSurname())
@@ -110,6 +133,19 @@ public class AuthenticationService {
         return response;
     }
 
+    private AddressPartEntity getAddressPart(AddressPartDto addressPartDto) {
+        return addressPartRepository.findByObjectGuid(addressPartDto.getObjectGuid()).orElseGet(() ->
+                addressPartRepository.save(AddressPartEntity
+                        .builder()
+                        .fullTypeName(addressPartDto.getFullTypeName())
+                        .level(addressPartDto.getLevel())
+                        .typeName(addressPartDto.getTypeName())
+                        .objectGuid(addressPartDto.getObjectGuid())
+                        .name(addressPartDto.getName())
+                        .build()
+                )
+        );
+    }
     public AuthenticationResponse registerIndividual(RegisterIndividualRequest request) throws UserNotFoundException, EmailIsOccupiedException, UsernameIsOccupiedException, MigrationServiceNotFoundException {
         AuthenticationResponse response = this.registerUser(request.getRegisterRequest());
         UserEntity user = userRepository.findByUsername(request.getRegisterRequest().getUsername()).orElseThrow(() -> new UserNotFoundException("User not found"));
@@ -144,15 +180,13 @@ public class AuthenticationService {
                 .build();
     }
 
-    public String forgotPassword(String email) throws UserNotFoundException {
+    public String forgotPassword(String email, String password) throws UserNotFoundException {
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        PasswordResetTokenEntity token = generatePasswordResetToken(userEntity);
-        passwordResetTokenRepository.save(token);
-        String url = apiUrl + "/auth/reset_password?token=" + token.getToken();
-        EmailDetails emailDetails = getEmailDetails(url, email, "Click the link to reset password: ", "Password reset");
+        userEntity.setPassword(passwordEncoder.encode(password));
+        userRepository.save(userEntity);
 
-        return emailService.sendMail(emailDetails);
+        return "Password reset succeeded";
     }
 
     public String validatePasswordResetToken(String token) throws PasswordResetTokenNotFoundException, PasswordResetTokenIsExpiredException {

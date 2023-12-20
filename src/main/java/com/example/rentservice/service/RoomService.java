@@ -46,7 +46,7 @@ public class RoomService {
     private UserRoomRepository userRoomRepository;
 
     public List<RoomDto> getRooms() {
-        return roomRepository.findAvailableRooms().stream().map(RoomDto::toDto).toList();
+        return roomRepository.findAll().stream().map(RoomDto::toDto).toList();
     }
 
     public RoomDto createRoom(CreateRoomRequest request) throws BuildingNotFoundException {
@@ -199,5 +199,24 @@ public class RoomService {
         if (agreementRooms.isEmpty())
             throw new AgreementRoomsNotFoundExcetption("Agreement rooms not found");
         return agreementRooms.stream().map(AgreementRoomDto::toDto).toList();
+    }
+
+    public List<RoomDto> getAvailableRooms() {
+        return roomRepository.findAvailableRooms().stream().map(RoomDto::toDto).toList();
+    }
+
+    public List<AgreementRoomDto> getAgreementRoomsByRoomId(Long id) throws AgreementRoomsNotFoundExcetption {
+        List<AgreementRoomEntity> agreementRooms = agreementRoomRepository.findAllByRoom_Id(id);
+        return agreementRooms.stream().map(AgreementRoomDto::toDto).toList();
+    }
+
+    public List<RoomDto> getAvailableRoomsInBuilding(long id) throws BuildingNotFoundException {
+        BuildingEntity building = buildingRepository.findById(id).orElseThrow(() -> new BuildingNotFoundException("Building not found"));
+        return roomRepository.findAvailableRoomsInBuilding(building).stream().map(RoomDto::toDto).toList();
+    }
+
+    public List<RoomDto> getRoomInBuildingsWithRentals() throws BuildingNotFoundException {
+        List<RoomEntity> rooms = roomRepository.findRoomsInBuildingsWithRentals();
+        return rooms.stream().map(RoomDto::toDto).toList();
     }
 }

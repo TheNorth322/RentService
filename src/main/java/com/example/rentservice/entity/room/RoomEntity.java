@@ -40,10 +40,10 @@ public class RoomEntity {
             inverseJoinColumns = @JoinColumn(name = "type_id"))
     private Set<TypeEntity> types;
 
-    @OneToMany(mappedBy = "room")
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private Set<RoomImageEntity> roomImages;
 
-    @OneToMany(mappedBy = "room")
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private Set<AgreementRoomEntity> rents;
 
     @ManyToOne

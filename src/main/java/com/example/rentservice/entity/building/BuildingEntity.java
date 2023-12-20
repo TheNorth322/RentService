@@ -31,6 +31,6 @@ public class BuildingEntity {
 
     private String telephone;
 
-    @OneToMany(mappedBy = "building")
+    @OneToMany(mappedBy = "building", cascade = CascadeType.ALL)
     private Set<RoomEntity> rooms;
 }

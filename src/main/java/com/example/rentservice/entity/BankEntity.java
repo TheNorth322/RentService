@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Entity
 @Data
 @Builder
@@ -20,6 +22,6 @@ public class BankEntity {
 
     private String name;
 
-    @OneToOne(mappedBy = "bank")
-    private EntityUserEntity user;
+    @OneToMany(mappedBy = "bank")
+    private Set<EntityUserEntity> user;
 }

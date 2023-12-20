@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface AgreementRoomRepository extends JpaRepository<AgreementRoomEntity, Long> {
     List<AgreementRoomEntity> findAllByAgreement_Id(Long id);
+
+    List<AgreementRoomEntity> findAllByRoom_Id(Long id);
 }
