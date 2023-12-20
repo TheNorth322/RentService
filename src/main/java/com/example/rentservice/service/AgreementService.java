@@ -115,11 +115,11 @@ public class AgreementService {
     }
 
     private Date getStartsFrom(Long userId) throws UserRoomsNotFoundException {
-        return userRoomRepository.findFirstByUserIdOrderByStartOfRentAsc(userId).orElseThrow(() -> new UserRoomsNotFoundException("User room not found")).getStartOfRent();
+        return userRoomRepository.findFirstById_UserIdOrderByStartOfRentAsc(userId).orElseThrow(() -> new UserRoomsNotFoundException("User room not found")).getStartOfRent();
     }
 
     private Date getLastsTo(Long userId) throws UserRoomsNotFoundException {
-        return userRoomRepository.findFirstByUserIdOrderByEndOfRentDesc(userId).orElseThrow(() -> new UserRoomsNotFoundException("User room not found")).getEndOfRent();
+        return userRoomRepository.findFirstById_UserIdOrderByEndOfRentDesc(userId).orElseThrow(() -> new UserRoomsNotFoundException("User room not found")).getEndOfRent();
     }
 
     private long getMonthsDifference(Date startDate, Date endDate) {
